@@ -9,6 +9,7 @@
 #define _GLOBAL_H
 
 /* Buffer Section */
+/* Todo : transfer the implementation to buffer.h*/
 struct Buffer
 {
     int a;
@@ -17,6 +18,7 @@ typedef struct Buffer Buffer;
 void *getBuffer(const char *);
 
 /* BTree Section*/
+/* Todo : transfer the implementation to btree.h*/
 struct BTree
 {
     int a;
