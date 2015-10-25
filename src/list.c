@@ -1,7 +1,8 @@
 #include "list.h"
 #include <stdlib.h>
+#include "global.h"
 
-void List_init(List * list, unsigned int itemSize)
+void List_init(MiniList * list, unsigned int itemSize)
 {
     if (list == NULL)
     {
@@ -9,44 +10,41 @@ void List_init(List * list, unsigned int itemSize)
     }
     list->size = 0;
     list->head = NULL;
-    list->it = NULL;
+    list->it = list->head;
     list->itemSize_u32 = itemSize;
 }
 
-void List_append(List * list, void * item)
+void List_append(MiniList * list, void * item)
 {
-    unsigned int size;
     node *newNode;
-    if (list == NULL)
+    if (list == NULL || item == NULL)
     {
         return;
     }
-    size = list->itemSize_u32;
-    newNode = malloc(sizeof(node));
+    newNode = mallocZero(sizeof(node));
     newNode->Next = list->head;
-    newNode->data = malloc(list->size);
-    memcpy(newNode->data, item, size);
+    newNode->data = item;
     list->head = newNode;
     list->size++;
 }
 
-void *List_it(List * list)
+void *List_it(MiniList * list)
 {
-    node * tmp = list->it;
     if (list == NULL)
     {
         return NULL;
     }
-    list->it = tmp->Next;
+    node * tmp = list->it;
     if (tmp == NULL)
     {
         list->it = list->head;
         return NULL;
     }
+    list->it = tmp->Next;
     return tmp->data;
 }
 
-void List_delete(List * list)
+void List_delete(MiniList * list)
 {
     node *tmp;
     if (list == NULL)

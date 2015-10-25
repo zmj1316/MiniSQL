@@ -14,8 +14,8 @@ struct Buffer
 };
 typedef struct Buffer Buffer;
 void *getBuffer(const char *);
-void sync_window();
-void move_window(u32);
+void sync_window(Buffer *);
+void move_window(Buffer *,u32);
 
 #endif // _BUFFER_H
 

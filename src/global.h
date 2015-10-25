@@ -9,7 +9,7 @@
 #define _GLOBAL_H
 
 #define BLOCKSIZE 4096
-
+#define MAXCOLUMN 128
 
 typedef long i64;                  /* 8-byte signed integer */
 typedef unsigned long u64;         /* 8-byte unsigned integer */
@@ -20,8 +20,8 @@ typedef unsigned char u8;          /* 1-byte unsigned integer */
 typedef char i8;                   /* 1-byte signed integer */
 typedef int Bool;                  /* Boolean: 1=True 0=False*/
 
-const int True = 1;
-const int Flase = 0;
+#define True  1
+#define False 0
 
 void *mallocZero(u64);
 

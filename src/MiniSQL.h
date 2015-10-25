@@ -20,6 +20,14 @@ typedef struct miniSQL miniSQL;
 
 typedef enum dataType dataType;
 
+union Data
+{
+    int i;
+    float f;
+    char *str;
+};
+
+typedef union Data Data;
 struct column
 {
     char name_str[255];
@@ -34,25 +42,28 @@ struct table
 {
     char name_str[255];
     column *col;
-    //List *records;
+    //MiniList *records;
     u64 colNum_u64;
     u8 primarykey_u8;
     Buffer *buf;
-    u64 recordSize;
+    u32 recordSize;
+    u32 recordNum;
 };
 typedef struct table table;
 
 struct item
 {
     dataType type;
-    union Data
-    {
-        int i;
-        float f;
-        char *str;
-    }data;
+    Data data;
 };
 typedef struct item item;
+
+struct record
+{
+    item i[MAXCOLUMN];
+    Bool valid;
+};
+typedef struct record record;
 
 enum Compare
 {
@@ -63,48 +74,57 @@ struct Rule
 {
     u32 colNo;
     Compare cmp;
-    union Target
-    {
-        int i;
-        float f;
-        char *str;
-    }target;
+    Data target;
 };
 typedef struct Rule Rule;
 
 struct Filter
 {
-    List rules_list;
-
+    MiniList rules_list;
 };
 typedef struct Filter Filter;
 void Filter_add(Filter*, Rule *);
 
 
+
 /*********************/
 /* Public Functions  */
 /*********************/
-int miniSQL_open(
+Bool miniSQL_open(
     const char *,       /* Database filename  */
     miniSQL **          /* OUT: MiniSQL db handle */
     );
 
-int miniSQL_createTable(
+Bool miniSQL_createTable(
     miniSQL *,          /* Database handle */
     table *             /* Table */
     );
 
-int miniSQL_dropTable(
-    miniSQL *,          /* DAtabase handle*/
-    const char*         /* Table name*/
+Bool miniSQL_connectTable(
+    miniSQL *,
+    table *
     );
 
-List* miniSQL_select(
+Bool miniSQL_dropTable(
+    miniSQL *,          /* DAtabase handle*/
+    table *         /* Table name*/
+    );
+
+MiniList* miniSQL_select(
     miniSQL *,
-    const char *,
+    table *,
     Filter *
     );
-
+Bool miniSQL_insert(
+    miniSQL *,
+    table *,
+    MiniList *
+    );
+Bool miniSQL_delete(
+    miniSQL *,
+    table *,
+    MiniList *
+    );
 /***************/
 
  #endif /* _MINISQL_H */

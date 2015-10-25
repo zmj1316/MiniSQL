@@ -14,16 +14,16 @@ struct _node
 };
 
 
-struct List
+struct MiniList
 {
     unsigned long size;
     node *head;
     node *it;
     unsigned long itemSize_u32;
 };
-typedef struct List List;
-void List_init(List *, unsigned int);
-void List_append(List *, void *);
-void *List_it(List *);
-void List_delete(List *);
+typedef struct MiniList MiniList;
+void List_init(MiniList *, unsigned int);
+void List_append(MiniList *, void *);
+void *List_it(MiniList *);
+void List_delete(MiniList *);
 #endif /* _LIST_H */

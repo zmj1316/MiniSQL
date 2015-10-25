@@ -1,7 +1,6 @@
 #include "MiniSQL.h"
 #include "catalog.h"
-#include "recordmanager.h"
-#include <stdlib.h>
+
 
 int miniSQL_open(
     const char *filename,   /* Database filename  */
@@ -9,13 +8,14 @@ int miniSQL_open(
     )
 {
     miniSQL *db;          /* Store allocated handle here */
-    int rc;               /* Return code */
+    int rc = 0;               /* Return code */
 
     *ppDb = 0;
     db = mallocZero(sizeof(miniSQL)); 
     /*db->buf = getBuffer(filename);*/
 
     *ppDb = db;
+    return rc;
 }
 
 Bool miniSQL_createTable(
@@ -38,19 +38,19 @@ Bool miniSQL_dropTable(
 
 
 
-List * miniSQL_select(miniSQL *db, table *tb,Filter * filter)
+MiniList * miniSQL_select(miniSQL *db, table *tb,Filter * filter)
 {
-    List *result;
-    result = mallocZero(sizeof(List));
+    MiniList *result;
+    result = mallocZero(sizeof(MiniList));
     return result;
 }
 
-Bool miniSQL_insert(miniSQL *db, table *tb, List *record)
+Bool miniSQL_insert(miniSQL *db, table *tb, MiniList *record)
 {
     return True;
 }
 
-Bool miniSQL_delete(miniSQL *db, table *tb, List *record)
+Bool miniSQL_delete(miniSQL *db, table *tb, MiniList *record)
 {
     return True;
 }
