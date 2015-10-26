@@ -45,11 +45,11 @@ Recordmanager_getRecord(
     u32 capacity = BLOCKSIZE / tb->recordSize; /* Number of records in one block */
     for (u32 i = 0; i < (tb->recordNum + 1) / capacity; i++)
     {
-        move_window(tb->buf, i);
+        move_window(&(tb->buf), i);
         for (u32 i = 0; i < capacity; i++)
         {
-            u8 *ptr = tb->buf->win;
-            List_append(result, binary2record(tb,tb->buf->win + i * tb->recordSize));
+            u8 *ptr = tb->buf.win;
+            List_append(result, binary2record(tb,tb->buf.win + i * tb->recordSize));
         }
     }
     return result;

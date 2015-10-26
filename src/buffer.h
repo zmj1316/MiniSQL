@@ -13,9 +13,11 @@ struct Buffer
     u8 _dirty[CACHESIZE];
 };
 typedef struct Buffer Buffer;
-void *getBuffer(const char *);
+/* Public Functions */
+void buffer_init(Buffer *, const char *);
 void sync_window(Buffer *);
 void move_window(Buffer *,u32);
 
+/* Private Functions */
 #endif // _BUFFER_H
 

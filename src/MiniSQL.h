@@ -41,11 +41,11 @@ typedef struct column column;
 struct table
 {
     char name_str[255];
-    column *col;
+    column col[MAXCOLUMN];
     //MiniList *records;
     u64 colNum_u64;
     u8 primarykey_u8;
-    Buffer *buf;
+    Buffer buf;
     u32 recordSize;
     u32 recordNum;
 };

@@ -1,0 +1,101 @@
+\documentclass[notitlepage,cs4size,punct,oneside]{report}
+\usepackage{CJK}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{listings}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{txfonts}
+\usepackage[bookmarks]{hyperref}  
+\hypersetup{colorlinks=false,pdfborder=0 0 0}
+% \renewcommand{\ttdefault}{Times New Roman}
+\renewcommand{\ttdefault}{consolas}
+
+\lstset{numbers=left,frame=none, numberstyle=\tiny, xleftmargin=.5em,xrightmargin=.5em, aboveskip=1em, escapeinside='',extendedchars=false ,
+	keywordstyle=\small\bf\color{blue},
+   % identifierstyle=\bf,
+   numberstyle=\small\color{gray},
+  commentstyle=\bf\it\small\color{green},
+ stringstyle=\small\color{red},
+ % lineskip=-2pt,
+ % basicstyle=\ttfamily\small,
+ language=C
+ }
+
+\begin{document}
+
+\title{MiniSQL Document}
+\author{Key Zhang}
+
+\maketitle
+\tableofcontents
+
+\chapter{MiniSQL CLI}
+
+\chapter{MiniSQL API}
+
+\chapter{MiniSQL Structure}
+	\section{Buffer Manager}
+		\subsection{Data Struct}
+		\paragraph{}
+			\begin{lstlisting}
+struct Buffer
+{
+    u8 win[BLOCKSIZE]; // The window for client to visit
+    u32 winptr;// The block cached in win
+    u8 dirty;
+    u8 _cache[CACHESIZE][BLOCKSIZE];
+    u32 _cacheptr[CACHESIZE];
+    u8 _dirty[CACHESIZE];
+};
+typedef struct Buffer Buffer;
+			\end{lstlisting}
+		\subsection{Public Functions}
+			\paragraph{}
+			\begin{description}[align=left,style=sameline,leftmargin=7cm]
+			\item [Func :] Description :
+			\item [void buffer\_init(Buffer *, const char *);] Initialize the buffer with filename.
+			\item [void sync\_window(Buffer *);] Synchronize the buffer window: Write back to cache if 	it's dirty.
+			\item [void move\_window(Buffer *,u32);] Move the buffer window to specified block(	Synchronize First).
+			\item [void extend(...)] Extend the file.
+		\end{description}
+	\section{Record Manager}
+		\subsection{Data Struct}
+		\paragraph{}
+	    	\begin{lstlisting}
+struct item
+{
+    dataType type;
+    Data data;
+};
+typedef struct item item;
+
+struct record
+{
+    item i[MAXCOLUMN];
+    Bool valid;
+};
+typedef struct record record;	    		
+	    	\end{lstlisting}
+	    \subsection{Public Functions}
+	    \paragraph{}
+	    \begin{description}[align=left,style=sameline,leftmargin=8cm]
+		\item [Func :] Description :
+	    \item [MiniList *Recordmanager\_getRecord(table *tb);] Return all records in table.
+	    \item [Insert]
+	    \item [Select]
+	    \item [Delete]
+	    \item [...]
+	    \end{description}
+	\section{Catalog Manager}
+		\subsection{Public Functions}
+			\paragraph{}
+			\begin{description}[align=left,style=sameline,leftmargin=7cm]
+			\item [Func :] Description :
+			\item [createTable]
+			\item [connectTable]
+			\item [dropTable]
+			\item [RegIndex]
+			\item [RMIndex]
+		\end{description}
+\end{document}
