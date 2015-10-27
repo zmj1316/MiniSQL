@@ -30,7 +30,7 @@ Bool miniSQL_createTable(
 
 Bool miniSQL_dropTable(
     miniSQL *db,          /* Database handle*/
-    const char* tb        /* Table name*/
+    table* tb        /* Table name*/
     )
 {
     return True;
