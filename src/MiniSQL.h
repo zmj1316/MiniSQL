@@ -30,62 +30,60 @@ union Data
 typedef union Data Data;
 struct column
 {
-    char name_str[255];
-    dataType type;
-    u8 unique_u8;
-    u8 size_u8;
+    char name_str[255];// column name
+    dataType type;// data type
+    Bool unique_u8;// unique?
+    u8 size_u8;// size: int&float->4 str->0~255
 };
 typedef struct column column;
 
 
 struct table
 {
-    char name_str[255];
-    column col[MAXCOLUMN];
-    //MiniList *records;
-    u64 colNum_u64;
-    u8 primarykey_u8;
-    Buffer buf;
-    u32 recordSize;
-    u32 recordNum;
+    char name_str[255];// table name
+    column col[MAXCOLUMN];// columns
+    u64 colNum_u64;// column number
+    u8 primarykey_u8;// Primary key
+    Buffer buf;// the buffer 
+    u32 recordSize;// The size of one piece of record
+    u32 recordNum;// number of records
 };
 typedef struct table table;
 
 struct item
 {
-    dataType type;
-    Data data;
+    dataType type;// datatype
+    Data data;// item data
 };
 typedef struct item item;
 
 struct record
 {
-    item i[MAXCOLUMN];
-    Bool valid;
+    item i[MAXCOLUMN];// 
+    Bool valid;// valid flag (??)
 };
 typedef struct record record;
 
 enum Compare
 {
-    LT, LE, EQ, GE, GT
+    LT, LE, EQ, GE, GT // Compare type
 };
 typedef enum Compare Compare;
 struct Rule
 {
-    u32 colNo;
-    Compare cmp;
-    Data target;
+    u32 colNo;// compare source index
+    Compare cmp;// compare type
+    Data target;// compare target
 };
 typedef struct Rule Rule;
 
 struct Filter
 {
-    MiniList rules_list;
+    //MiniList rules_list;
+    Rule rules[MAXCOLUMN];
 };
 typedef struct Filter Filter;
-void Filter_add(Filter*, Rule *);
-
-
+//void Filter_add(Filter*, Rule *);
 
 /*********************/
 /* Public Functions  */
@@ -124,6 +122,10 @@ Bool miniSQL_delete(
     miniSQL *,
     table *,
     MiniList *
+    );
+
+void miniSQL_disconnectTable(
+    table *
     );
 /***************/
 
