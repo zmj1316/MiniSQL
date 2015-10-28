@@ -35,7 +35,7 @@ static record * binary2record(table* tb, u8* bin)
     return result;
 }
 
-Bool record2binary(table* tb, u8* bin, record * entry)
+static Bool record2binary(table* tb, u8* bin, record * entry)
 {
     *bin++ = 0;/* valid = true */
     for (u32 i = 0; i < tb->colNum_u64; i++)

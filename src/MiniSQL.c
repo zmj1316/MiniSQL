@@ -1,5 +1,6 @@
 #include "MiniSQL.h"
 #include "catalog.h"
+#include <stdlib.h>
 
 
 int miniSQL_open(
@@ -26,6 +27,11 @@ Bool miniSQL_createTable(
     Bool rc;
     rc = catalog_createTable(db, tb);
     return rc;
+}
+
+table* miniSQL_connectTable(const char* filename)
+{
+    return NULL;
 }
 
 Bool miniSQL_dropTable(

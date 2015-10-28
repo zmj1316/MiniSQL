@@ -47,7 +47,7 @@ struct table
     Buffer buf;// the buffer 
     u32 recordSize;// The size of one piece of record
     u32 recordNum;// number of records
-};
+};  
 typedef struct table table;
 
 struct item
@@ -98,13 +98,12 @@ Bool miniSQL_createTable(
     table *             /* Table */
     );
 
-Bool miniSQL_connectTable(
-    miniSQL *,
-    table *
+table *miniSQL_connectTable(
+    const char*filename
     );
 
 Bool miniSQL_dropTable(
-    miniSQL *,          /* DAtabase handle*/
+    miniSQL *,          /* Database handle*/
     table *         /* Table name*/
     );
 

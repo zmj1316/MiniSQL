@@ -33,4 +33,3 @@ enum dataType
 
 
 #endif                             /* _GLOBAL_H */
-
