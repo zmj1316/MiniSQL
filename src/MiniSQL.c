@@ -31,6 +31,7 @@ Bool miniSQL_createTable(
 
 table* miniSQL_connectTable(const char* filename)
 {
+    
     return NULL;
 }
 
