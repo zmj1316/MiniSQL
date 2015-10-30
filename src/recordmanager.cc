@@ -1,22 +1,22 @@
 #include "recordmanager.h"
 #include "buffer.h"
-#include <memory.h>
 #include <list>
 static record binary2record(table* tb, u8* bin)
 {
     record result;
-    if ((*bin) == 0xFF)
+    /* Check validity */
+    if ((*bin) == 0xFF) // 0xFF invalid
     {
         result.valid = False;
         return result;
     }
-    bin++;
+    bin++;// move ptr
     result.valid = True;
     for (u32 i = 0; i < tb->colNum_u64; i++)
     {
-        column *col = &(tb->col[i]);
-        result.i[i].type = col->type;
-        switch (col->type)
+        column *col = &(tb->col[i]); // get current column
+        result.i[i].type = col->type;// get datatype
+        switch (col->type)           // fetch data
         {
         case INT:
             result.i[i].data.i = *reinterpret_cast<int *>(bin);
@@ -26,12 +26,13 @@ static record binary2record(table* tb, u8* bin)
             break;
         case CHAR:
             result.i[i].data.str = new char[col->size_u8];
+            // reg string to str
             memcpy(result.i[i].data.str,reinterpret_cast<char *>(bin), col->size_u8);/* Mem leap! */
             break;
         default:
             break;
         }
-        bin += col->size_u8;
+        bin += col->size_u8;    //move ptr
     }
     return result;
 }
@@ -41,8 +42,9 @@ static bool record2binary(table* tb, u8* bin, record * entry)
     *bin++ = 0;/* valid = true */
     for (u32 i = 0; i < tb->colNum_u64; i++)
     {
-        column *col = &(tb->col[i]);
-        item * it = &(entry->i[i]);
+        column *col = &(tb->col[i]); // get column
+        item * it = &(entry->i[i]);  // get item
+        // write data
         switch (it->type)
         {
         case INT: 
@@ -57,11 +59,12 @@ static bool record2binary(table* tb, u8* bin, record * entry)
         default:
             break;
         }
+        bin += col->size_u8;    //move ptr
     }
     return True;
 }
 
-std::vector<record>                   /* MiniList of record */
+std::vector<record>                   /* vector of record */
 Recordmanager_getRecord(
     table* tb           /* table to visit */
     )
@@ -71,10 +74,9 @@ Recordmanager_getRecord(
     for (u32 i = 0; i < (tb->recordNum - 1) / capacity + 1; i++) /* For all blocks */
     {
         move_window(&(tb->buf), i);  /* move to operation block */
-        for (u32 i = 0; i < capacity; i++)
+        for (u32 i1 = 0; i1 < capacity; i1++)
         {
-            u8 *ptr = tb->buf.win;
-            result.push_back(binary2record(tb, tb->buf.win + i * tb->recordSize));
+            result.push_back(binary2record(tb, tb->buf.win + i1 * tb->recordSize));
         }
     }
     return result;

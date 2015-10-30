@@ -25,5 +25,4 @@ void newBlock(Buffer *);
 /* Private Functions */
 static void diskWrite(Buffer *buf, u32 block, u8 * bin);
 static void diskRead(Buffer *buf, u32 block, u8 * bin);
-static u32 LUR(Buffer *buf, u32 block);
 #endif // _BUFFER_H

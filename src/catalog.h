@@ -2,31 +2,13 @@
 #define _CATALOG_H
 #include "global.h"
 
-//struct cmitem
-//{
-//    char *name_str;
-//    dataType type;
-//    u8 unique_u8;
-//    u8 size_u8;
-//};
-//typedef struct cmitem cmitem;
-//
-//struct cmtable
-//{
-//    char *name_str;
-//    cmitem *col_item;
-//    u64 colNum_u64;
-//    u8 primarykey_u8;
-//};
-//typedef struct cmtable cmtable;
-
-Bool catalog_createTable(
+Bool catalog_createTable(       // generate the catalog file according to the given property 
     table *
     );
-Bool catalog_connectTable(
+Bool catalog_connectTable(      // fill the table property according to the tablename
     table *
     );
-Bool catalog_dropTable(
+Bool catalog_dropTable(         // delete the catalog file
     table *
     );
 

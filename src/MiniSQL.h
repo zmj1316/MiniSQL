@@ -7,7 +7,6 @@
 #define _MINISQL_H
 #include "global.h"
 #include "buffer.h"
-#include <iostream>
 #include <vector>
 using namespace std;
 /******************/
@@ -80,17 +79,13 @@ public:
 /*********************/
 /* Public Functions  */
 /*********************/
-//Bool miniSQL_open(
-//    const char *,       /* Database filename  */
-//    miniSQL **          /* OUT: MiniSQL db handle */
-//    );
 
 bool miniSQL_createTable(
     table *             /* Table */
     );
 
 table *miniSQL_connectTable(
-    const char*filename
+    const char *filename
     );
 
 bool miniSQL_dropTable(
