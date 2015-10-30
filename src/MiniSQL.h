@@ -6,19 +6,13 @@
 #ifndef _MINISQL_H
 #define _MINISQL_H
 #include "global.h"
-#include "list.h"
 #include "buffer.h"
-
+#include <iostream>
+#include <vector>
+using namespace std;
 /******************/
 /* Data Structures*/
 /******************/
-struct miniSQL
-{
-    int a;
-};
-typedef struct miniSQL miniSQL;
-
-typedef enum dataType dataType;
 
 union Data
 {
@@ -26,20 +20,20 @@ union Data
     float f;
     char *str;
 };
-
 typedef union Data Data;
-struct column
+
+class column
 {
+public:
     char name_str[255];// column name
     dataType type;// data type
-    Bool unique_u8;// unique?
+    bool unique_u8;// unique?
     u8 size_u8;// size: int&float->4 str->0~255
 };
-typedef struct column column;
 
-
-struct table
+class table
 {
+public:
     char name_str[255];// table name
     column col[MAXCOLUMN];// columns
     u64 colNum_u64;// column number
@@ -47,54 +41,51 @@ struct table
     Buffer buf;// the buffer 
     u32 recordSize;// The size of one piece of record
     u32 recordNum;// number of records
-};  
-typedef struct table table;
+};
 
-struct item
+class item
 {
+public:
     dataType type;// datatype
     Data data;// item data
 };
-typedef struct item item;
 
-struct record
+class record
 {
-    item i[MAXCOLUMN];// 
-    Bool valid;// valid flag (??)
+public:
+    vector<item> i;
+    bool valid;// valid flag (??)
 };
-typedef struct record record;
 
 enum Compare
 {
     LT, LE, EQ, GE, GT // Compare type
 };
 typedef enum Compare Compare;
-struct Rule
+class Rule
 {
+public:
     u32 colNo;// compare source index
     Compare cmp;// compare type
     Data target;// compare target
 };
-typedef struct Rule Rule;
 
-struct Filter
+class Filter
 {
+public:
     //MiniList rules_list;
-    Rule rules[MAXCOLUMN];
+    vector<Rule> rules;
 };
-typedef struct Filter Filter;
-//void Filter_add(Filter*, Rule *);
 
 /*********************/
 /* Public Functions  */
 /*********************/
-Bool miniSQL_open(
-    const char *,       /* Database filename  */
-    miniSQL **          /* OUT: MiniSQL db handle */
-    );
+//Bool miniSQL_open(
+//    const char *,       /* Database filename  */
+//    miniSQL **          /* OUT: MiniSQL db handle */
+//    );
 
 Bool miniSQL_createTable(
-    miniSQL *,          /* Database handle */
     table *             /* Table */
     );
 
@@ -103,24 +94,20 @@ table *miniSQL_connectTable(
     );
 
 Bool miniSQL_dropTable(
-    miniSQL *,          /* Database handle*/
     table *         /* Table name*/
     );
 
-MiniList* miniSQL_select(
-    miniSQL *,
+vector<record> miniSQL_select(
     table *,
     Filter *
     );
 Bool miniSQL_insert(
-    miniSQL *,
     table *,
-    MiniList *
+    const record *
     );
 Bool miniSQL_delete(
-    miniSQL *,
     table *,
-    MiniList *
+    Filter *
     );
 
 void miniSQL_disconnectTable(

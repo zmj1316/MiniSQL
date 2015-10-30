@@ -23,7 +23,7 @@ typedef int Bool;                  /* Boolean: 1=True 0=False*/
 #define True  1
 #define False 0
 
-void *mallocZero(u64);
+//void *mallocZero(u64);
 
 
 enum dataType
