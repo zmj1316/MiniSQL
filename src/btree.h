@@ -21,20 +21,21 @@ extern "C"{
     /* Private */
     struct node
     {
-        u32 keyNum;
-        node *parent;
-        node **childs;
-        Data *datas;
-        u32 N;// B+ tree capacity
-    };
+        node *parent;   // 4 byte
+        node *childs[BLOCKSIZE/];  // 
+        Data datas[BLOCKSIZE/sizeof(Data)];
+        u32 N;// B+ tree capacity 4 byte
+        u32 nodeNo;     // 4 byte
+    };  
     typedef struct node node;
     static node *allocNode(u32 N);
     struct btree
     {
         node *head;
+        u32 N;
     };
     typedef struct btree btree;
-    static insert(btree *, )
+    static void insert(btree *, node *);
 
 }
 #endif // _BTREE_H

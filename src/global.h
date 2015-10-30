@@ -18,13 +18,6 @@ typedef unsigned short u16;        /* 2-byte unsigned integer */
 typedef short i16;                 /* 2-byte signed integer */
 typedef unsigned char u8;          /* 1-byte unsigned integer */
 typedef char i8;                   /* 1-byte signed integer */
-typedef int Bool;                  /* Boolean: 1=True 0=False*/
-
-#define True  1
-#define False 0
-
-//void *mallocZero(u64);
-
 
 enum dataType
 {

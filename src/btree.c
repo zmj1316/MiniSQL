@@ -1,5 +1,6 @@
 #include "btree.h"
 #include "recordmanager.h"
+#include "global.h"
 bool btree_create(table* tb, u32 index)
 {
     if (tb == nullptr)
@@ -11,6 +12,6 @@ bool btree_create(table* tb, u32 index)
     strcpy_s(filename, 255, tb->name_str);
     strcat_s(filename, 259, ".idx");
     fopen_s(&fp, filename, "wb");
-    
+    int capacity = BLOCKSIZE / sizeof(node);
 
 }
