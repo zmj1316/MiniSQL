@@ -85,7 +85,7 @@ public:
 //    miniSQL **          /* OUT: MiniSQL db handle */
 //    );
 
-Bool miniSQL_createTable(
+bool miniSQL_createTable(
     table *             /* Table */
     );
 
@@ -93,7 +93,7 @@ table *miniSQL_connectTable(
     const char*filename
     );
 
-Bool miniSQL_dropTable(
+bool miniSQL_dropTable(
     table *         /* Table name*/
     );
 
@@ -101,11 +101,11 @@ vector<record> miniSQL_select(
     table *,
     Filter *
     );
-Bool miniSQL_insert(
+bool miniSQL_insert(
     table *,
     const record *
     );
-Bool miniSQL_delete(
+bool miniSQL_delete(
     table *,
     Filter *
     );
