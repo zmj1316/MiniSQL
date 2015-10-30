@@ -1,6 +1,7 @@
 #include "buffer.h"
-#include <string.h>
+#include <iostream>
 #include <stdio.h>
+#include <string.h>
 static void diskWrite(Buffer *buf, u32 block,u8 *bin)
 {
     FILE *fp;
@@ -22,7 +23,7 @@ static void diskRead(Buffer* buf, u32 block, u8* bin)
 void buffer_init(Buffer*buf, const char* filename)
 {
     strcpy_s(buf->filename,255,filename);
-    buf->dirty = False;
+    buf->dirty = false;
     buf->winptr = -1;
 }
 
@@ -31,7 +32,7 @@ void sync_window(Buffer* buf)
     if (buf->dirty)
     {
         diskWrite(buf, buf->winptr, buf->win);
-        buf->dirty = False;
+        buf->dirty = false;
     }
 }
 

@@ -1,0 +1,10 @@
+CC = g++
+test: test.o btree.o buffer.o
+	$(CC) test.o btree.o buffer.o -o test
+	./test
+test.o: global.h test/test.cc btree.o
+	$(CC) -c test.cc
+btree.o: global.h btree.h btree.c buffer.o 
+	$(CC) -c btree.c
+buffer.o: global.h buffer.h buffer.cpp
+	$(CC) -c buffer.cpp

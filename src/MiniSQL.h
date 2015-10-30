@@ -100,7 +100,7 @@ bool miniSQL_insert(
     table *,
     const record *
     );
-bool miniSQL_delete(
+u32 miniSQL_delete(
     table *,
     Filter *
     );

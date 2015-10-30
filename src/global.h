@@ -19,6 +19,8 @@ typedef short i16;                 /* 2-byte signed integer */
 typedef unsigned char u8;          /* 1-byte unsigned integer */
 typedef char i8;                   /* 1-byte signed integer */
 
+
+
 enum dataType
 {
     INT, CHAR, FLOAT

@@ -3,18 +3,18 @@
 #include "global.h"
 /* Buffer Section */
 
-#define CACHESIZE 32// The cache size of each buffer
+#define CACHESIZE 32 
+
 struct Buffer
 {
     u8 win[BLOCKSIZE]; // The window for client to visit
     u32 winptr;// The block cached in win
-    Bool dirty;
+    bool dirty;
     /* cache layer */
     u8 _cache[CACHESIZE][BLOCKSIZE];
     u32 _cacheptr[CACHESIZE];
     u8 _dirty[CACHESIZE];
-
-    char filename[255];
+    char filename[259];
 };
 typedef struct Buffer Buffer;
 /* Public Functions */

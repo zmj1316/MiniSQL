@@ -1,17 +1,17 @@
 #include "recordmanager.h"
 #include "buffer.h"
-#include <list>
+#include <memory.h>
 static record binary2record(table* tb, u8* bin)
 {
     record result;
     /* Check validity */
     if ((*bin) == 0xFF) // 0xFF invalid
     {
-        result.valid = False;
+        result.valid = false;
         return result;
     }
     bin++;// move ptr
-    result.valid = True;
+    result.valid = true;
     for (u32 i = 0; i < tb->colNum_u64; i++)
     {
         column *col = &(tb->col[i]); // get current column
@@ -61,7 +61,7 @@ static bool record2binary(table* tb, u8* bin, record * entry)
         }
         bin += col->size_u8;    //move ptr
     }
-    return True;
+    return true;
 }
 
 std::vector<record>                   /* vector of record */
@@ -91,6 +91,6 @@ bool Recordmanager_insertRecord(table* tb, record* entry)
     }
     move_window(&(tb->buf),(++tb->recordNum - 1) / capacity + 1);
     record2binary(tb, tb->buf.win + (tb->recordNum - 1) % capacity, entry);
-    tb->buf.dirty = True;
+    tb->buf.dirty = true;
     return true;
 }
