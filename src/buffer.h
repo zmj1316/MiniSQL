@@ -1,6 +1,7 @@
 #ifndef _BUFFER_H
 #define _BUFFER_H
 #include "global.h"
+
 /* Buffer Section */
 
 #define CACHESIZE 32 

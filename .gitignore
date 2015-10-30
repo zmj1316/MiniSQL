@@ -30,3 +30,8 @@
 
 # Debug files
 *.dSYM/
+
+#database
+src/*.idx
+src/*.cat
+src/*.db
