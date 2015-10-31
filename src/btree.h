@@ -20,9 +20,9 @@ bool btree_create(
     const char *,
     column *col);
 bool btree_insert(
-    table *tb,
-    u32 index,
-    item i
+    const char *,
+    item i,
+    u32 value
     );
 bool btree_delete(
     table *tb,
@@ -50,7 +50,9 @@ struct btree
 };
 typedef struct btree btree;
 //static void insert(btree *, node *);
-static void getBtree(btree*, char *);
+static void getBtree(btree*, const char *);
 static void getNode(btree*,node * ,u32 block);
-static void saveNode(btree*, node *, u32 block);
+static void saveNode(btree*, node *);
+static void shiftData(Data* data, u32 index,u32 N);
+static void shiftChild(u32* child, u32 index, u32 N);
 #endif // _BTREE_H
