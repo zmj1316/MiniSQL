@@ -110,8 +110,9 @@ bool miniSQL_createIndex(
     const char * indexname
     );
 bool miniSQL_dropIndex(
-    table *,
-    u32 index
+    //table *,
+    //u32 index
+    const char *
     );
 void miniSQL_disconnectTable(
     table *

@@ -71,8 +71,8 @@ static void findNode(btree*, node*, Data*);
 static void splitNode(btree*, node*source,node*dst);
 
 static u8 cmp(dataType type, Data sourse,Data target);
-//static void shiftData(Data* data, u32 index,u32 N);
-//static void shiftChild(u32* child, u32 index, u32 N);
+static void datacpy(dataType type, Data *dst, Data *source);
 
 static void insertData(btree*,node *nd, u32 index, Data* target, u32 value);
+static void insertNonleaf(btree*, node*, u32 parent);
 #endif // _BTREE_H

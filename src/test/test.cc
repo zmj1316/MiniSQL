@@ -7,18 +7,20 @@ int main()
 {
     table tb;
     column col;
-    col.type = INT;
+    col.type = CHAR;
     strcpy_s(col.name_str,255, "Hello");
-    col.size_u8 = 4;
+    col.size_u8 = 200;
     col.unique_u8 = true;
     strcpy_s(tb.name_str,255, "test");
     btree_create(&tb, "0", &col);
-    item i;
-    i.data.i = 1;
-    i.type = INT;
-    item i2;
-    i2.data.i = 2;
-    i2.type = INT;
-    btree_insert("0", i, 0);
-    btree_insert("0", i2, 1);
+    item ii;
+    ii.data.str = "hello world";
+    ii.type = CHAR;
+    for (size_t i = 0; i < 100; i++)
+    {
+        btree_insert("0", ii, i);
+        char tmp[255];
+        sprintf(tmp, "Key%d", i);
+        ii.data.str = tmp;
+    }
 }
