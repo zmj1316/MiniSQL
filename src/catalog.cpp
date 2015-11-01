@@ -4,25 +4,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "stdlib.h"
-////////////////////////////////////////////////////////////////////////////////
-#define MAXCOLUMN 555
-typedef char u8;
-typedef long u32;
-typedef long long u64;
-typedef char* Buffer;
-typedef int column;
-struct table
-{
-    char name_str[255];// table name
-    column col[MAXCOLUMN];// columns
-    u64 colNum_u64;// column number
-    u8 primarykey_u8;// Primary key
-    Buffer buf;// the buffer 
-    u32 recordSize;// The size of one piece of record
-    u32 recordNum;// number of records
-};
-///////////////////////////////////////////////////////////////////////////////
-
+#include "MiniSQL.h"
 class temp
 {
 public:

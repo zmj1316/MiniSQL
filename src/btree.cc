@@ -60,9 +60,10 @@ bool btree_insert(const char *idxname, item target,u32 value)
         newNode(&bt, &nnode);
         splitNode(&bt, &nd, &nnode);
         insertNonleaf(&bt, &nnode, nd.parent);
-        saveNode(&bt,&nnode);
+        freeNode(&bt,&nnode);
     }
-    saveNode(&bt, &nd);
+    freeNode(&bt, &nd);
+    freeBtree(&bt);
     return true;
 }
 
@@ -91,6 +92,7 @@ void freeBtree(btree* bt)
     move_window(&bt->buf, 0);
     bt->buf.dirty = true;
     *(u32*)(bt->buf.win + BLOCKCOUNT) = bt->blockcount;
+    *(u32*)(bt->buf.win + ROOTPTR) = bt->root;
     sync_window(&bt->buf);
 }
 
@@ -294,7 +296,27 @@ void insertNonleaf(btree* bt, node* nd, u32 parent)
         nnode.childs[1] = nd->nodeNo;
         root.parent = nnode.nodeNo;
         nd->parent = nnode.nodeNo;
+        bt->root = nnode.nodeNo;
         freeNode(bt, &root);
         freeNode(bt, &nnode);
+        fprintf(stdout, "Root is %u\n", bt->root);
+    }
+    else
+    {
+        node p;
+        getNode(bt, &p, parent);
+        size_t i;
+        for (i = 0; i < p.N && cmp(bt->type, p.datas[i], nd->datas[0]) <= 0; i++);
+        insertData(bt, &p, i, &nd->datas[0], nd->nodeNo);
+        if (p.N>bt->capacity) // split
+        {
+            node nnode;
+            newNode(bt, &nnode);
+            splitNode(bt, &p, &nnode);
+            insertNonleaf(bt, &nnode, p.parent);
+            saveNode(bt, &nnode);
+            freeNode(bt, &nnode);
+        }
+        freeNode(bt, &p);
     }
 }

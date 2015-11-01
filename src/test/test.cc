@@ -16,11 +16,12 @@ int main()
     item ii;
     ii.data.str = "hello world";
     ii.type = CHAR;
-    for (size_t i = 0; i < 100; i++)
+    for (size_t i = 0; i < 1000; i++)
     {
         btree_insert("0", ii, i);
         char tmp[255];
         sprintf(tmp, "Key%d", i);
         ii.data.str = tmp;
     }
+    system("pause");
 }

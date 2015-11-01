@@ -3,7 +3,7 @@
 #include <string.h>
 bool miniSQL_createTable(table* tb)
 {
-    //catalog_createTable(tb);
+    catalog_createTable(tb);
     char tmp[259];
     strcpy_s(tmp,255, tb->name_str);
     strcat(tmp,".db");
@@ -18,6 +18,6 @@ table* miniSQL_connectTable(const char* tablename)
     strcpy_s(tmp,255, tablename);
     strcat(tmp, ".db");
     buffer_init(&(tb->buf), tmp);
-    //catalog_connectTable(tb);
+    catalog_connectTable(tb);
     return tb;
 }
