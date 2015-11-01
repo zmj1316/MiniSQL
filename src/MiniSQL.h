@@ -58,7 +58,7 @@ public:
 
 enum Compare
 {
-    LT, LE, EQ, GE, GT // Compare type
+    LT, LE, EQ, NE,GE, GT // Compare type
 };
 typedef enum Compare Compare;
 class Rule
@@ -104,7 +104,15 @@ u32 miniSQL_delete(
     table *,
     Filter *
     );
-
+bool miniSQL_createIndex(
+    table *,
+    const char * columnname,
+    const char * indexname
+    );
+bool miniSQL_dropIndex(
+    table *,
+    u32 index
+    );
 void miniSQL_disconnectTable(
     table *
     );
