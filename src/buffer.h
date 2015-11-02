@@ -4,17 +4,21 @@
 
 /* Buffer Section */
 
-#define CACHESIZE 32 
+#define CACHESIZE 64
 
 struct Buffer
 {
+#ifdef TINYBUF
     u8 win[BLOCKSIZE]; // The window for client to visit
-    u32 winptr;// The block cached in win
-    bool dirty;
+#else
+    u8* win;
     /* cache layer */
     u8 _cache[CACHESIZE][BLOCKSIZE];
     u32 _cacheptr[CACHESIZE];
     bool _dirty[CACHESIZE];
+#endif
+    u32 winptr;// The block cached in win
+    bool dirty;
     char filename[259];
 };
 typedef struct Buffer Buffer;

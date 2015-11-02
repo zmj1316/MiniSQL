@@ -31,6 +31,7 @@ void buffer_init(Buffer*buf, const char* filename)
         buf->_cacheptr[i] = -1;
     }
 }
+#ifdef TINYBUF
 void sync_window(Buffer* buf)
 {
     if (buf->dirty)
@@ -46,43 +47,38 @@ void move_window(Buffer* buf, u32 block)
     diskRead(buf, block, buf->win);
     buf->winptr = block;
 }
-//void sync_window(Buffer* buf)
-//{
-//    if (buf->dirty)
-//    {
-//        diskWrite(buf, buf->_cacheptr[buf->winptr], buf->win);
-//        buf->dirty = false;
-//    }
-//    for (size_t i = 0; i < CACHESIZE; i++)
-//    {
-//        if (buf->_dirty[i])
-//        {
-//            diskWrite(buf, buf->_cacheptr[i], buf->_cache[i]);
-//            buf->_dirty[i] = false;
-//        }
-//    }
-//}
-//
-//void move_window(Buffer* buf, u32 block)
-//{
-//    if (buf->_cacheptr[buf->winptr] == block) return;
-//    sync_window(buf);
-//    for (size_t i = 0; i < CACHESIZE; i++)
-//    {
-//        if (buf->_cacheptr[i]==block)
-//        {
-//            memcpy(buf->win, buf->_cache[i],BLOCKSIZE);
-//            buf->winptr = i;
-//            return;
-//        }
-//    }
-//    u32 dst = block%CACHESIZE;
-//    diskRead(buf, block, buf->_cache[dst]);
-//    buf->_cacheptr[dst] = block;
-//    memcpy(buf->win, buf->_cache[dst], BLOCKSIZE);
-//    buf->winptr = dst;
-//}
+#else
+void sync_window(Buffer* buf)
+{
+    if (buf->dirty)
+    {
+        buf->_dirty[buf->winptr] = true;
+        buf->dirty = false;
+    }
+    for (size_t i = 0; i < CACHESIZE; i++)
+    {
+        if (buf->_dirty[i])
+        {
+            diskWrite(buf, buf->_cacheptr[i], buf->_cache[i]);
+            buf->_dirty[i] = false;
+        }
+    }
+}
 
+void move_window(Buffer* buf, u32 block)
+{
+    if (buf->_cacheptr[buf->winptr] == block && buf->winptr!=-1) return;
+    sync_window(buf);
+    u32 dst = block%CACHESIZE;
+    if (buf->_cacheptr[dst] != block)
+    {
+        diskRead(buf, block, buf->_cache[dst]);
+        buf->_cacheptr[dst] = block;
+    }
+    buf->win = buf->_cache[dst];
+    buf->winptr = dst;
+}
+#endif
 void newBlock(Buffer* buf)
 {
     FILE *fp;

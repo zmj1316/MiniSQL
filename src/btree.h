@@ -22,20 +22,22 @@
 
 /* Public Functions */
 bool btree_create(
-    table *tb,
-    const char *,
-    column *col);
+    const char *,   // index name
+    column *col     // column to build index
+    );
 bool btree_insert(
-    const char *,
-    item i,
-    u32 value
+    const char *,   // index name
+    Data* i,         // Data to insert
+    u32 value       // value(blocknum)
     );
-bool btree_delete(
-    table *tb,
-    u32 index,
-    item i
+u32 btree_delete(
+    const char *,   // index name
+    Rule*         // Filter
     );
-
+vector<u32> btree_select(
+    const char *,   // index name
+    Rule *        // Filter    
+    );
 /* Private */
 struct node
 {
@@ -77,5 +79,7 @@ static void datacpy(btree* bt, Data *dst, Data *source);
 static void insertData(btree*,node *nd, u32 index, Data* target, u32 value);
 static void insertNonleaf(btree*, node*, u32 parent);
 
+static void deleteData(btree*, node *nd, u32 index);
+static void deleteNonleaf(btree*, u32 parent);
 void travel(const char *);
 #endif // _BTREE_H

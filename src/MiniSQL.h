@@ -9,6 +9,11 @@
 #include "buffer.h"
 #include <vector>
 using namespace std;
+
+
+
+
+
 /******************/
 /* Data Structures*/
 /******************/
@@ -119,5 +124,7 @@ void miniSQL_disconnectTable(
     table *
     );
 /***************/
+
+u8 Rule_cmp(dataType type, Data* s, Data *dst, Rule *);
 
  #endif /* _MINISQL_H */

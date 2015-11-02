@@ -6,11 +6,11 @@
 #include <string>
 #include <io.h>
 /* create index of {col} in {tb} named {idxname}*/
-bool btree_create(table* tb,const char * idxname, column *col)
+bool btree_create(const char * idxname, column *col)
 {
-    if (tb == NULL)
+    if (col == NULL)
     {
-        fprintf(stderr, "Table not Exists!");
+        fprintf(stderr, "Column not Exists!");
         return false;
     }
     /* generate the index filename */
@@ -24,7 +24,7 @@ bool btree_create(table* tb,const char * idxname, column *col)
         return false;
     }
     /* buffer for write */
-    Buffer buf;
+    static Buffer buf;
     buffer_init(&buf, filename);
     newBlock(&buf);
     move_window(&buf,0);
@@ -34,7 +34,7 @@ bool btree_create(table* tb,const char * idxname, column *col)
     *(u32*)(buf.win + ROOTPTR) = 1;
     buf.dirty = true;
     sync_window(&buf);
-    btree bt;
+    static btree bt;
     getBtree(&bt, idxname);
     node n;
     newNode(&bt, &n);
@@ -46,18 +46,15 @@ bool btree_create(table* tb,const char * idxname, column *col)
     return true;
 }
 
-bool btree_insert(const char *idxname, item target,u32 value)
+bool btree_insert(const char *idxname, Data *target,u32 value)
 {
-    btree bt;
+    static btree bt;
     if (!getBtree(&bt, idxname)) return false;
     node nd;
-    findNode(&bt, &nd, &target.data);
+    findNode(&bt, &nd, target);
     size_t i;
-    for (i = 0; i < nd.N && cmp(bt.type, nd.datas[i], target.data)<=0; i++)
-    {
-        
-    }
-    insertData(&bt,&nd, i, &target.data, value);
+    for (i = 0; i < nd.N && cmp(bt.type, nd.datas[i], *target) <= 0; i++);
+    insertData(&bt,&nd, i, target, value);
     saveNode(&bt, &nd);
     if (nd.N>bt.capacity) // split
     {
@@ -71,6 +68,52 @@ bool btree_insert(const char *idxname, item target,u32 value)
     freeNode(&bt, &nd);
     freeBtree(&bt);
     return true;
+}
+
+vector<u32> btree_select(const char* idxname, Rule * rule)
+{
+    static btree bt;
+    vector<u32> res;
+    if (!getBtree(&bt, idxname))
+    {
+        fprintf(stderr, "Index Not Exist!");
+        return res;
+    }
+    node nd;
+    u32 head = 1;
+    switch (rule->cmp)
+    {
+    default:
+        break;
+    case LT: 
+    case LE: 
+        head = 1;
+        break;
+    case EQ:
+    case GE:
+    case GT: 
+        findNode(&bt, &nd, &rule->target);
+        head = nd.nodeNo;
+        break;
+    }
+    while (head!=NONEXT)
+    {
+        getNode(&bt, &nd, head);
+        for (size_t i = 0; i < nd.N; i++)
+        {
+            if (Rule_cmp(bt.type,&nd.datas[i],&rule->target,rule)==1)
+            {
+                res.push_back(nd.childs[i]);
+            }
+            else
+            {
+                break;
+            }
+        }
+        head = nd.next;
+    }
+    return res;
+
 }
 
 bool getBtree(btree* bt_ptr, const char* idxname)
@@ -104,13 +147,13 @@ void freeBtree(btree* bt)
 
 void getNode(btree* bt, node* nd, u32 block)
 {
-    u8 * bin = bt->buf.win;
     if (block>bt->blockcount)
     {
         fprintf(stderr, "block out of range");
 
     }
     move_window(&bt->buf, block); 
+    u8 * bin = bt->buf.win;
     nd->parent = *((u32*)(bin + PARENTBLOCK));
     nd->N = *((u32*)bin + ENTRYCOUNT);
     nd->nodeNo = block;
@@ -153,7 +196,6 @@ void newNode(btree* bt, node* nd)
 {
     bt->blockcount++;
     newBlock(&bt->buf);
-    //move_window(&bt->buf, bt->blockcount);
     nd->N = 0;
     nd->nodeNo = bt->blockcount;
     nd->next = NONEXT;
@@ -163,7 +205,6 @@ void newNode(btree* bt, node* nd)
 
 void freeNode(btree* bt, node* nd)
 {
-    //saveNode(bt, nd);
     if (bt->type==CHAR)
     {
         for (size_t i = 0; i < nd->N; i++)
@@ -177,8 +218,8 @@ void freeNode(btree* bt, node* nd)
 
 void saveNode(btree* bt, node* nd)
 {
-    u8 * bin = bt->buf.win;
     move_window(&bt->buf, nd->nodeNo);
+    u8 * bin = bt->buf.win;
     bt->buf.dirty = true;
     *(u32*)(bin + PARENTBLOCK) = nd->parent;
     *(u32*)(bin + ENTRYCOUNT) = nd->N;
@@ -234,13 +275,13 @@ void splitNode(btree* bt, node* source, node* dst)
     dst->parent = source->parent;
     if (source->next!=NONLEAFMARK)
     {
-        fprintf(stdout, "leaf sp %u to %u to %u\n", source->nodeNo,dst->nodeNo,source->next);
+        //fprintf(stdout, "leaf sp %u to %u to %u\n", source->nodeNo,dst->nodeNo,source->next);
         dst->next = source->next;
         source->next = dst->nodeNo;
     }
     else
     {
-        fprintf(stdout, "nonleaf %u to %u\n", source->nodeNo, dst->nodeNo);
+        //fprintf(stdout, "nonleaf %u to %u\n", source->nodeNo, dst->nodeNo);
 
         for (size_t i = 0; i < dst->N; i++)
         {
@@ -300,9 +341,6 @@ void insertData(btree* bt,node* nd, u32 index, Data* target, u32 value)
     for (size_t i = nd->N; i > index; i--)
     {
         nd->datas[i] = nd->datas[i - 1];
-    }
-    for (size_t i = nd->N; i > index; i--)
-    {
         nd->childs[i] = nd->childs[i - 1];
     }
     datacpy(bt, &nd->datas[index],target);
@@ -333,7 +371,7 @@ void insertNonleaf(btree* bt, node* nd, u32 parent)
         freeNode(bt, &root);
         saveNode(bt, &nnode);
         freeNode(bt, &nnode);
-        fprintf(stdout, "Root is %u\n", bt->root);
+        //fprintf(stdout, "Root is %u\n", bt->root);
     }
     else
     {
@@ -361,10 +399,9 @@ void insertNonleaf(btree* bt, node* nd, u32 parent)
         freeNode(bt, &p);
     }
 }
-
 void travel(const char * str)
 {
-    btree bt;
+    static btree bt;
     getBtree(&bt, str);
     u32 cur = 1;
     FILE *fp;
@@ -375,7 +412,7 @@ void travel(const char * str)
         getNode(&bt, &n, cur);
         for (size_t i = 0; i < n.N; i++)
         {
-            fprintf(fp,"%s\n", n.datas[i].str);
+            fprintf(fp, "%s\n", n.datas[i].str);
             //fputs(n.datas[i].str, fp);
         }
         fprintf(fp, "***********\n");
@@ -383,4 +420,19 @@ void travel(const char * str)
     }
     fprintf(fp, "========================================\n");
     fclose(fp);
+}
+
+void deleteData(btree* bt, node* nd, u32 index)
+{
+    for (size_t i = index; i < nd->N; i++)
+    {
+        nd->datas[i] = nd->datas[i + 1];
+        nd->childs[i] = nd->childs[i + 1];
+    }
+    nd->N--;
+}
+
+void deleteNonleaf(btree*, u32 parent)
+{
+
 }

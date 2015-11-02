@@ -12,6 +12,8 @@ using namespace std;
 #define BLOCKSIZE 4096
 #define MAXCOLUMN 128
 
+//#define TINYBUF
+
 typedef long i64;                  /* 8-byte signed integer */
 typedef unsigned long u64;         /* 8-byte unsigned integer */
 typedef unsigned int u32;          /* 4-byte unsigned integer */
