@@ -26,7 +26,9 @@ bool btree_create(const char * idxname, column *col)
     /* buffer for write */
     static Buffer buf;
     buffer_init(&buf, filename);
+    /* alloc new block */
     newBlock(&buf);
+    /* set index attributes */
     move_window(&buf,0);
     *((u32*)(buf.win + NODESIZE)) = col->size_u8 + sizeof(u32);
     *(u8*)(buf.win + DATATYPE) = col->type;
@@ -34,6 +36,7 @@ bool btree_create(const char * idxname, column *col)
     *(u32*)(buf.win + ROOTPTR) = 1;
     buf.dirty = true;
     sync_window(&buf);
+    /* alloc root node */
     static btree bt;
     getBtree(&bt, idxname);
     node n;
@@ -45,23 +48,31 @@ bool btree_create(const char * idxname, column *col)
     freeBtree(&bt);
     return true;
 }
-
+/* insert data into index */
 bool btree_insert(const char *idxname, Data *target,u32 value)
 {
     static btree bt;
+    /* get index info */
     if (!getBtree(&bt, idxname)) return false;
     node nd;
+    /* find node to insert */
     findNode(&bt, &nd, target);
+    /* find locate inside node*/
     size_t i;
     for (i = 0; i < nd.N && cmp(bt.type, nd.datas[i], *target) <= 0; i++);
+    /* perform insert */
     insertData(&bt,&nd, i, target, value);
     saveNode(&bt, &nd);
+    /* check if node is overfull */
     if (nd.N>bt.capacity) // split
     {
+        /* alloc new node */
         node nnode;
         newNode(&bt, &nnode);
+        /* split node into two */
         splitNode(&bt, &nd, &nnode);
         saveNode(&bt, &nd);
+        /* insert new node into parent */
         insertNonleaf(&bt, &nnode, nd.parent);
         freeNode(&bt, &nnode);
     }
@@ -70,8 +81,57 @@ bool btree_insert(const char *idxname, Data *target,u32 value)
     return true;
 }
 
+u32 btree_delete(const char* idxname, Rule* rule)
+{
+    /* get index info */
+    static btree bt;
+    if (!getBtree(&bt, idxname)) return false;
+    node nd;
+    /* find node to delete */
+    findNode(&bt, &nd, &rule->target);
+    size_t i;
+    /* locate */
+    for (i = 0; i < nd.N && cmp(bt.type, nd.datas[i], rule->target) <= 0; i++);
+    deleteData(&bt, &nd, i - 1);
+    saveNode(&bt, &nd);
+    /* less than N/2 */
+    if (nd.N<bt.capacity/2)
+    {
+        node next;
+        if (nd.next!=NONEXT)
+        {
+            deleteNonleaf(&bt, &nd.datas[0], nd.parent);
+            getNode(&bt, &next, nd.next);
+            //mergeNode(&bt, &nd, &next);
+            if (nd.N+next.N<=bt.capacity)
+            {
+                for (size_t i = 0; i < nd.N; i++)
+                {
+                    insertData(&bt, &next, i, &nd.datas[i], nd.childs[i]);
+                }
+                saveNode(&bt, &next);
+            }
+            else
+            {
+
+            }
+        }
+        else
+        {
+            node par;
+            getNode(&bt, &par, nd.parent);
+            u32 i;
+            getNode(&bt, &next, par.childs[par.N - 1]);
+            freeNode(&bt, &par);
+            //mergeNode(&bt, &next, &nd);
+        }
+
+    }
+}
+
 vector<u32> btree_select(const char* idxname, Rule * rule)
 {
+    /* get index info*/
     static btree bt;
     vector<u32> res;
     if (!getBtree(&bt, idxname))
@@ -116,30 +176,37 @@ vector<u32> btree_select(const char* idxname, Rule * rule)
 
 }
 
+/* get index attributes */
 bool getBtree(btree* bt_ptr, const char* idxname)
 {
+    /* generate file name */
     char filename[259];
     strcpy_s(filename, 255, idxname);
     strcat(filename, ".idx");
+    /* check file */
     if (_access(filename, 0) != 0)
     {
         fprintf(stderr, "Index Don't Exists!");
         return false;
     }
+    /* initialize buffer */
     buffer_init(&bt_ptr->buf, filename);
+    /* read jead block */
     move_window(&(bt_ptr->buf), 0);
-    bt_ptr->nodeSize = *(u32 *)(bt_ptr->buf.win + NODESIZE);
-    bt_ptr->type = (dataType)*(bt_ptr->buf.win + DATATYPE);
-    bt_ptr->capacity = (BLOCKSIZE - DATAHEAD) / bt_ptr->nodeSize - 1;
-    bt_ptr->root = *(u32*)(bt_ptr->buf.win + ROOTPTR);
-    bt_ptr->blockcount = *(u32*)(bt_ptr->buf.win + BLOCKCOUNT);
+    bt_ptr->nodeSize = *(u32 *)(bt_ptr->buf.win + NODESIZE);    // node size
+    bt_ptr->type = (dataType)*(bt_ptr->buf.win + DATATYPE);     // data type
+    bt_ptr->capacity = (BLOCKSIZE - DATAHEAD) / bt_ptr->nodeSize - 1;   // capacity of one block
+    bt_ptr->root = *(u32*)(bt_ptr->buf.win + ROOTPTR);          // root block
+    bt_ptr->blockcount = *(u32*)(bt_ptr->buf.win + BLOCKCOUNT); // count of blocks
     return true;
 }
 
 void freeBtree(btree* bt)
 {
+    /* move to head block */
     move_window(&bt->buf, 0);
     bt->buf.dirty = true;
+    /* write attributes */
     *(u32*)(bt->buf.win + BLOCKCOUNT) = bt->blockcount;
     *(u32*)(bt->buf.win + ROOTPTR) = bt->root;
     sync_window(&bt->buf);
@@ -147,17 +214,20 @@ void freeBtree(btree* bt)
 
 void getNode(btree* bt, node* nd, u32 block)
 {
+    /* check range */
     if (block>bt->blockcount)
     {
         fprintf(stderr, "block out of range");
 
     }
+    /* read disk */
     move_window(&bt->buf, block); 
     u8 * bin = bt->buf.win;
     nd->parent = *((u32*)(bin + PARENTBLOCK));
     nd->N = *((u32*)bin + ENTRYCOUNT);
     nd->nodeNo = block;
     nd->next = *(u32*)(bin + NEXTBLOCK);
+    /* alloc memory */
     if (nd->childs==NULL)
     {
         nd->childs = new u32[bt->capacity + 1];
@@ -203,6 +273,7 @@ void newNode(btree* bt, node* nd)
     nd->datas = new Data[bt->capacity + 1];
 }
 
+
 void freeNode(btree* bt, node* nd)
 {
     if (bt->type==CHAR)
@@ -246,11 +317,13 @@ void saveNode(btree* bt, node* nd)
     sync_window(&bt->buf);
 }
 
+/* find leaf node fits data */
 void findNode(btree* bt, node* nd, Data* data)
 {
+    /* start with root */
     u32 cur = bt->root;
     getNode(bt, nd, cur);
-    while (nd->next == NONLEAFMARK)
+    while (nd->next == NONLEAFMARK) // until find leaf
     {
         u32 i;
         for (i = 1; i < nd->N && cmp(bt->type, nd->datas[i], *data) <= 0; i++)
@@ -262,27 +335,28 @@ void findNode(btree* bt, node* nd, Data* data)
     }
 }
 
+/* split half of the source node into dst*/
 void splitNode(btree* bt, node* source, node* dst)
 {
-    u32 halfcapa = (bt->capacity + 1) / 2;
-    u32 mid = bt->capacity + 1 - halfcapa;
+    u32 halfcapa = (bt->capacity + 1) / 2;  // nodes to be moved 
+    u32 mid = bt->capacity + 1 - halfcapa;  // nodes remained
     for (size_t i = 0; i < halfcapa; i++)
     {
         insertData(bt, dst, i, &source->datas[mid + i], source->childs[mid + i]);
     }
     source->N = mid;
     dst->N = halfcapa;
+    /* assign parent */
     dst->parent = source->parent;
-    if (source->next!=NONLEAFMARK)
+    if (source->next!=NONLEAFMARK)  //leaf nodes
     {
-        //fprintf(stdout, "leaf sp %u to %u to %u\n", source->nodeNo,dst->nodeNo,source->next);
+        /* link the nodes */
         dst->next = source->next;
         source->next = dst->nodeNo;
     }
-    else
+    else                            //nonleaf nodes
     {
-        //fprintf(stdout, "nonleaf %u to %u\n", source->nodeNo, dst->nodeNo);
-
+        /* assign childs of new node */
         for (size_t i = 0; i < dst->N; i++)
         {
             node tmp;
@@ -294,6 +368,12 @@ void splitNode(btree* bt, node* source, node* dst)
     }
 }
 
+void mergeNode(btree*, node* source, node* dst)
+{
+
+}
+
+/* compare two data */
 u8 cmp(dataType type, Data sourse, Data target)// 1: GT 0:LE
 {
     u8 cmp;
@@ -315,6 +395,7 @@ u8 cmp(dataType type, Data sourse, Data target)// 1: GT 0:LE
     return cmp;
 }
 
+/* copy one data to another */
 void datacpy(btree* bt, Data* dst, Data* source)
 {
     switch (bt->type)
@@ -329,8 +410,10 @@ void datacpy(btree* bt, Data* dst, Data* source)
     }
 }
 
+/* insert data into node */
 void insertData(btree* bt,node* nd, u32 index, Data* target, u32 value)
 {
+    /* only for initial root */
     if (nd->N==0)
     {
         datacpy(bt, &nd->datas[index], target);
@@ -338,24 +421,27 @@ void insertData(btree* bt,node* nd, u32 index, Data* target, u32 value)
         nd->N++;
         return;
     }
+    /* move the data */
     for (size_t i = nd->N; i > index; i--)
     {
         nd->datas[i] = nd->datas[i - 1];
         nd->childs[i] = nd->childs[i - 1];
     }
+    /* insert */
     datacpy(bt, &nd->datas[index],target);
     nd->childs[index] = value;
     nd->N++;
 }
 
+/* insert into nonleaf node */
 void insertNonleaf(btree* bt, node* nd, u32 parent)
 {
-    if (parent==ROOTMARK)// new root node
+    if (parent==ROOTMARK)// need new root (root splited)
     {
         node nnode;
         node root;
-        newNode(bt, &nnode);
-        getNode(bt, &root, bt->root);
+        newNode(bt, &nnode);            // new root
+        getNode(bt, &root, bt->root);   // root
         nnode.parent = ROOTMARK;
         nnode.N = 2;
         nnode.next = NONLEAFMARK;
@@ -371,12 +457,12 @@ void insertNonleaf(btree* bt, node* nd, u32 parent)
         freeNode(bt, &root);
         saveNode(bt, &nnode);
         freeNode(bt, &nnode);
-        //fprintf(stdout, "Root is %u\n", bt->root);
     }
-    else
+    else    // normal
     {
-        node p;
+        node p; // parent node to be inserted
         getNode(bt, &p, parent);
+        /* locate */
         size_t i;
         for (i = 0; i < p.N && cmp(bt->type, p.datas[i], nd->datas[0]) <= 0; i++)
         {
@@ -388,12 +474,12 @@ void insertNonleaf(btree* bt, node* nd, u32 parent)
         saveNode(bt, &p);
         if (p.N>bt->capacity) // split non leaf node
         {
-            node nnode;
-            newNode(bt, &nnode);
-            nnode.next = NONLEAFMARK;
-            splitNode(bt, &p, &nnode);
-            saveNode(bt, &p);
-            insertNonleaf(bt, &nnode, p.parent);
+            node nnode;                 // new nonleaf node
+            newNode(bt, &nnode);        
+            nnode.next = NONLEAFMARK;   // mark as nonleaf
+            splitNode(bt, &p, &nnode);  // split
+            saveNode(bt, &p);           // save inserted node
+            insertNonleaf(bt, &nnode, p.parent);    // insert the new node into upper parent
             freeNode(bt, &nnode);
         }
         freeNode(bt, &p);
@@ -432,7 +518,14 @@ void deleteData(btree* bt, node* nd, u32 index)
     nd->N--;
 }
 
-void deleteNonleaf(btree*, u32 parent)
+void deleteNonleaf(btree* bt,Data* data, u32 parent)
 {
+    node nd;
+    getNode(bt, &nd, parent);
+    u32 i;
+    for (i = 0; i < nd.N && cmp(bt->type, nd.datas[i], *data) <= 0; i++)
+    {
 
+    }
+    deleteData(bt, &nd, i - 1);
 }

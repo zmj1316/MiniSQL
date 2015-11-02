@@ -11,15 +11,16 @@
 
 
 //offset in block
-#define ENTRYCOUNT      0 // 4byte: count the number of entries in one block
+#define ENTRYCOUNT      0 // 4byte: count the number of entries in one block 0xFFFFFFFF >> empty block
 #define PARENTBLOCK     4 // 4byte: the parent block number (0xFFFFFFFF for root)
 #define NEXTBLOCK       8 // 4byte: the next block number (0xFFFFFFFE for non leaf 0xFFFFFFFF for leaf without next block)
 #define DATAHEAD        12// begin of node data
 
+
 #define ROOTMARK 0xFFFFFFFF
 #define NONLEAFMARK 0xFFFFFFFE
 #define NONEXT 0xFFFFFFFF
-
+#define EMPTYBLOCK 0xFFFFFFFF
 /* Public Functions */
 bool btree_create(
     const char *,   // index name
@@ -72,6 +73,7 @@ static void saveNode(btree*, node *);
 
 static void findNode(btree*, node*, Data*);
 static void splitNode(btree*, node*source,node*dst);
+static void mergeNode(btree*, node*source, node*dst);
 
 static u8 cmp(dataType type, Data sourse,Data target);
 static void datacpy(btree* bt, Data *dst, Data *source);
@@ -80,6 +82,6 @@ static void insertData(btree*,node *nd, u32 index, Data* target, u32 value);
 static void insertNonleaf(btree*, node*, u32 parent);
 
 static void deleteData(btree*, node *nd, u32 index);
-static void deleteNonleaf(btree*, u32 parent);
+static void deleteNonleaf(btree*,Data*, u32 parent);
 void travel(const char *);
 #endif // _BTREE_H
