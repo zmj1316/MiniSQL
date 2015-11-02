@@ -14,14 +14,15 @@ int main()
     strcpy_s(tb.name_str,255, "test");
     btree_create(&tb, "0", &col);
     item ii;
-    ii.data.str = "hello world";
-    ii.type = CHAR;
+    ii.type = col.type;
+    char tmp[255];
     for (size_t i = 0; i < 1000; i++)
     {
-        btree_insert("0", ii, i);
-        char tmp[255];
+        //ii.data.i = i;
         sprintf(tmp, "Key%d", i);
         ii.data.str = tmp;
+        btree_insert("0", ii, i);
     }
+    travel("0");
     system("pause");
 }

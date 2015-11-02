@@ -14,7 +14,7 @@ struct Buffer
     /* cache layer */
     u8 _cache[CACHESIZE][BLOCKSIZE];
     u32 _cacheptr[CACHESIZE];
-    u8 _dirty[CACHESIZE];
+    bool _dirty[CACHESIZE];
     char filename[259];
 };
 typedef struct Buffer Buffer;

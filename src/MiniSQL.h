@@ -96,6 +96,7 @@ vector<record> miniSQL_select(
     table *,
     Filter *
     );
+
 bool miniSQL_insert(
     table *,
     const record *

@@ -35,13 +35,14 @@ bool btree_delete(
     u32 index,
     item i
     );
+
 /* Private */
 struct node
 {
     u32 parent;   // 4 byte
     /* The first 2 block is to store block info */
-    Data *datas;
-    u32 *childs;
+    Data *datas=NULL;
+    u32 *childs=NULL;
     u32 N;
     u32 nodeNo;     // 4 byte
     u32 next;
@@ -71,8 +72,10 @@ static void findNode(btree*, node*, Data*);
 static void splitNode(btree*, node*source,node*dst);
 
 static u8 cmp(dataType type, Data sourse,Data target);
-static void datacpy(dataType type, Data *dst, Data *source);
+static void datacpy(btree* bt, Data *dst, Data *source);
 
 static void insertData(btree*,node *nd, u32 index, Data* target, u32 value);
 static void insertNonleaf(btree*, node*, u32 parent);
+
+void travel(const char *);
 #endif // _BTREE_H
