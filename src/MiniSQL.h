@@ -104,7 +104,7 @@ vector<record> miniSQL_select(
 
 bool miniSQL_insert(
     table *,
-    const record *
+    record *
     );
 u32 miniSQL_delete(
     table *,

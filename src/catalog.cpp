@@ -50,7 +50,7 @@ bool catalog_connectTable(      // fill the table property according to the tabl
     
     if((fp = fopen(filename,"wb"))==NULL)
     {        fprintf(stderr,"Can't open the file") ;
-             return 0;
+             return false;
     }
 
     fread(tb->name_str,255,1,fp); 
@@ -61,7 +61,7 @@ bool catalog_connectTable(      // fill the table property according to the tabl
     fread(&tb->recordNum,sizeof(u32),1,fp); 
         
     fclose(fp); 
-    return 1;    
+    return true;    
 }
 
 bool catalog_dropTable(         // delete the catalog file

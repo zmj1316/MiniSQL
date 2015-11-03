@@ -68,7 +68,7 @@ bool Init()
 int todigit(string str)
 {
     int k = 0;
-    for (int i = 0; i < str.length(); i++)
+    for (size_t i = 0; i < str.length(); i++)
     {
         k = k * 10 + str[i] - '0';
         i++;
@@ -78,7 +78,7 @@ int todigit(string str)
 
 void transfer(char *p, string str)
 {
-    int i;
+    size_t i;
     for (i = 0; i < str.length(); i++)
     {
         *(p + i) = str.at(i);
@@ -276,7 +276,7 @@ void select()
         if (sql[2] == "from")
         {
             table *p;
-            if (sql[3].find_first_of(';') >= 0)
+            if (sql[3].find_first_of(';') != -1)
             {
                 sql[3] = sql[3].substr(0, sql[3].find_first_of(';'));
                 if ((p = miniSQL_connectTable(sql[3].c_str())) != NULL)
@@ -313,7 +313,7 @@ void select()
                         int i = 0, j = 5;
                         while ((sql[j + 2].at(sql[j + 2].length() - 1) != ';') && (sql[j + 3] == "and"))
                         {
-                            int k = 0;
+                            size_t k = 0;
                             for (k = 0; k < p->colNum_u64; k++)
                             {
                                 string name;
@@ -399,7 +399,7 @@ void insert()
             {
                 int k = 0;
                 record rcd;
-                while (sql[4].find_first_of(",") >= 0)
+                while (sql[4].find_first_of(",") != -1)
                 {
                     rcd.i[k].type = p->col[k].type;
                     string sub = sql[4].substr(1, sql[4].find_first_of(",") - 1);
@@ -516,7 +516,7 @@ void delet()
                     int i = 0, j = 4;
                     while ((sql[j + 2].at(sql[j + 2].length() - 1) != ';') && (sql[j + 3] == "and"))
                     {
-                        int k = 0;
+                        size_t k = 0;
                         for (k = 0; k < p->colNum_u64; k++)
                         {
                             string name;
@@ -709,6 +709,4 @@ int main()
             }
         }
     }
-
-    return 0;
 }

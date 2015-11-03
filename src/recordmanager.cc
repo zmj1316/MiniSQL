@@ -82,7 +82,7 @@ Recordmanager_getRecord(
     return result;
 }
 
-bool Recordmanager_insertRecord(table* tb, record* entry)
+bool Recordmanager_insertRecord(table* tb,record* entry)
 {
     u32 capacity = BLOCKSIZE / (tb->recordSize + 1); /* Number of records in one block (Record size is +1 for the valid flag)*/
     if (tb->recordNum % capacity == 0)

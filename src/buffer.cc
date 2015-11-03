@@ -2,6 +2,8 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include <io.h>
+
 static void diskWrite(Buffer *buf, u32 block,u8 *bin)
 {
     FILE *fp;

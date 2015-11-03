@@ -5,7 +5,7 @@
 #include <string.h>
 #include <string>
 #include <io.h>
-/* create index of {col} in {tb} named {idxname}*/
+/* create index of {col} in {tb} named {idxname} */
 bool btree_create(const char * idxname, column *col)
 {
     if (col == NULL)
@@ -100,20 +100,34 @@ u32 btree_delete(const char* idxname, Rule* rule)
         node next;
         if (nd.next!=NONEXT)
         {
-            deleteNonleaf(&bt, &nd.datas[0], nd.parent);
             getNode(&bt, &next, nd.next);
             //mergeNode(&bt, &nd, &next);
             if (nd.N+next.N<=bt.capacity)
             {
+                deleteNonleaf(&bt, &nd.datas[0], nd.parent);
                 for (size_t i = 0; i < nd.N; i++)
                 {
                     insertData(&bt, &next, i, &nd.datas[i], nd.childs[i]);
                 }
+                nd.N = EMPTYBLOCK;
                 saveNode(&bt, &next);
+                saveNode(&bt, &nd);
             }
             else
             {
-
+                deleteNonleaf(&bt, &next.datas[0], next.parent);
+                u32 size = (nd.N + next.N);
+                for (size_t i = 0; i < size/2 - nd.N; i++)
+                {
+                    nd.datas[nd.N + i] = next.datas[0];
+                    deleteData(&bt, &next, 0);
+                }
+                nd.N = size / 2;
+                next.N = size - (size / 2);
+                /* update parent */
+                saveNode(&bt, &nd);
+                saveNode(&bt, &next);
+                insertNonleaf(&bt, &next,next.parent);
             }
         }
         else
@@ -121,7 +135,7 @@ u32 btree_delete(const char* idxname, Rule* rule)
             node par;
             getNode(&bt, &par, nd.parent);
             u32 i;
-            getNode(&bt, &next, par.childs[par.N - 1]);
+            getNode(&bt, &next, par.childs[par.N - 2]);
             freeNode(&bt, &par);
             //mergeNode(&bt, &next, &nd);
         }
@@ -528,4 +542,9 @@ void deleteNonleaf(btree* bt,Data* data, u32 parent)
 
     }
     deleteData(bt, &nd, i - 1);
+    //
+    if (nd.N<bt->capacity/2)
+    {
+
+    }
 }

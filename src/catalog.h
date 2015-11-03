@@ -7,7 +7,7 @@ bool catalog_createTable(       // generate the catalog file according to the gi
 bool catalog_connectTable(      // fill the table property according to the tablename
     table *
     );
-bool catalog_disconnectTable(         // delete the catalog file
+bool catalog_dropTable(         // delete the catalog file
     table *
     );
 #endif
