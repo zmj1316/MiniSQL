@@ -30,6 +30,7 @@ class column
 {
 public:
     char name_str[255];// column name
+    char idxname[255]; // index name empty for No index
     dataType type;// data type
     bool unique_u8;// unique?
     u8 size_u8;// size: int&float->4 str->0~255

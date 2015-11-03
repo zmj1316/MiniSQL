@@ -7,8 +7,8 @@
 #define BLOCKCOUNT      0 // 4byte: block number in index
 #define NODESIZE        4 // 4byte: the size of one node
 #define ROOTPTR         8 // 4byte: Root block
-#define DATATYPE        12 // 1byte: datatype 0:int 2:float 1:char
-
+#define HEADPTR         12// 4byte: head block
+#define DATATYPE        16// 1byte: datatype 0:int 2:float 1:char
 
 //offset in block
 #define ENTRYCOUNT      0 // 4byte: count the number of entries in one block 0xFFFFFFFF >> empty block
@@ -20,7 +20,8 @@
 #define ROOTMARK 0xFFFFFFFF
 #define NONLEAFMARK 0xFFFFFFFE
 #define NONEXT 0xFFFFFFFF
-#define EMPTYBLOCK 0xFFFFFFFF
+#define EMPTYBLOCK 0x0
+#include <set>
 /* Public Functions */
 bool btree_create(
     const char *,   // index name
@@ -35,7 +36,7 @@ u32 btree_delete(
     const char *,   // index name
     Rule*         // Filter
     );
-vector<u32> btree_select(
+set<u32> btree_select(
     const char *,   // index name
     Rule *        // Filter    
     );
@@ -60,11 +61,12 @@ struct btree
     u16 capacity;
     u32 root;
     u32 blockcount;
+    u32 head;
 };
 typedef struct btree btree;
 //static void insert(btree *, node *);
 static bool getBtree(btree*, const char *);
-static void freeBtree(btree*);
+static void saveBtree(btree*);
 
 static void getNode(btree*,node * ,u32 block);
 static void newNode(btree*, node *);
@@ -83,5 +85,7 @@ static void insertNonleaf(btree*, node*, u32 parent);
 
 static void deleteData(btree*, node *nd, u32 index);
 static void deleteNonleaf(btree*,Data*, u32 parent);
+static void refreshBlock(btree*);
+
 void travel(const char *);
 #endif // _BTREE_H
