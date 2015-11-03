@@ -33,13 +33,18 @@ bool btree_insert(
     u32 value       // value(blocknum)
     );
 u32 btree_delete(
-    const char *,   // index name
-    Rule*         // Filter
+    const char *,
+    Rule *
+    );
+u32 btree_delete_node(
+    const char *,
+    Data *
     );
 set<u32> btree_select(
     const char *,   // index name
     Rule *        // Filter    
     );
+
 /* Private */
 struct node
 {
@@ -65,6 +70,10 @@ struct btree
 };
 typedef struct btree btree;
 //static void insert(btree *, node *);
+u32 btree_delete_node(
+    btree *,   // index name
+    Data*         // Filter
+    );
 static bool getBtree(btree*, const char *);
 static void saveBtree(btree*);
 
@@ -77,7 +86,7 @@ static void findNode(btree*, node*, Data*);
 static void splitNode(btree*, node*source,node*dst);
 static void mergeNode(btree*, node*source, node*dst);
 
-static u8 cmp(dataType type, Data sourse,Data target);
+static i8 cmp(dataType type, Data sourse,Data target);
 static void datacpy(btree* bt, Data *dst, Data *source);
 
 static void insertData(btree*,node *nd, u32 index, Data* target, u32 value);
@@ -86,6 +95,7 @@ static void insertNonleaf(btree*, node*, u32 parent);
 static void deleteData(btree*, node *nd, u32 index);
 static void deleteNonleaf(btree*,Data*, u32 parent);
 static void refreshBlock(btree*);
-
+static void refreshParents(btree* bt,Data *data,u32 parent,u32 offset);
 void travel(const char *);
+void travel2(const char*);
 #endif // _BTREE_H

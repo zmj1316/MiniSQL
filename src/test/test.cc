@@ -15,24 +15,25 @@ int main()
     Data ii;
     char tmp[255];
     long long a = time(NULL);
-    for (size_t i = 0; i < 200; i++)
+    for (size_t i = 0; i < 200000; i++)
     {
         //ii.data.i = i;
         sprintf(tmp, "Key%d", i);
         ii.str = tmp;
         btree_insert("0", &ii, i);
     }
-    travel("0");
+    printf("TIme:%llu\n", time(NULL) - a);
     Rule rr;
     rr.cmp = LT;
     rr.colNo = 0;
-    rr.target.str="Key99";
-    for (size_t i = 0; i < 99; i++)
+    rr.target.str=new char[255];
+    char *s = rr.target.str;
+    for (size_t i = 0; i < 1990; i++)
     {
-        printf("%u\n",i);
-        btree_delete("0", &rr);
-        //travel("0");
+        sprintf(s, "Key%u", i);
+        btree_delete_node("0", &rr.target);
     }
+    travel("0");
     
     //btree_delete("0", &rr);
 
@@ -47,5 +48,5 @@ int main()
     //{
     //    cout << res[i] << endl;
     //}
-    //system("pause");
+    system("pause");
 }
