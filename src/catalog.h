@@ -10,4 +10,7 @@ bool catalog_connectTable(      // fill the table property according to the tabl
 bool catalog_dropTable(         // delete the catalog file
     table *
     );
+bool catalog_disconnectTable(
+    table *
+    );
 #endif

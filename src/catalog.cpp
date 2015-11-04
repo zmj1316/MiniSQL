@@ -25,7 +25,7 @@ bool catalog_createTable(       // generate the catalog file according to the gi
     
     if((fp = fopen(filename,"wb"))==NULL)
     {        fprintf(stderr,"Can't open the file") ;
-             return 0;
+             return false;
     }
     fwrite(tb->name_str,255,1,fp); 
     fwrite(tb->col,sizeof(column)*MAXCOLUMN,1,fp); 
@@ -35,7 +35,7 @@ bool catalog_createTable(       // generate the catalog file according to the gi
     fwrite(&tb->recordNum,sizeof(u32),1,fp); 
 
     fclose(fp);
-    return 1;
+    return true;
 }
            
 bool catalog_connectTable(      // fill the table property according to the tablename
@@ -48,7 +48,7 @@ bool catalog_connectTable(      // fill the table property according to the tabl
     strcpy(filename,tb->name_str);
     strcat(filename,".cat");
     
-    if((fp = fopen(filename,"wb"))==NULL)
+    if((fp = fopen(filename,"rb"))==NULL)
     {        fprintf(stderr,"Can't open the file") ;
              return false;
     }
@@ -78,9 +78,30 @@ bool catalog_dropTable(         // delete the catalog file
     {        fprintf(stderr,"Can't open the file") ;
              return 0;
     }
-    char p[2]={""};
-    fwrite(p,1,1,fp);
+    remove(filename);
     return 1;
+}
+
+bool catalog_disconnectTable(table *tb)
+{
+    FILE *fp;
+    char filename[260];
+    strcpy(filename, tb->name_str);
+    strcat(filename, ".cat");
+    if ((fp = fopen(filename, "wb")) == NULL)
+    {
+        fprintf(stderr, "Can't open the file");
+        return false;
+    }
+    fwrite(tb->name_str, 255, 1, fp);
+    fwrite(tb->col, sizeof(column)*MAXCOLUMN, 1, fp);
+    fwrite(&tb->colNum_u64, sizeof(u64), 1, fp);// column number
+    fwrite(&tb->primarykey_u8, sizeof(u8), 1, fp);
+    fwrite(&tb->recordSize, sizeof(u32), 1, fp);
+    fwrite(&tb->recordNum, sizeof(u32), 1, fp);
+
+    fclose(fp);
+    return true;
 }
 
 #endif

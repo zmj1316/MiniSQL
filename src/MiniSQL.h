@@ -91,7 +91,7 @@ bool miniSQL_createTable(
     );
 
 table *miniSQL_connectTable(
-    const char *filename
+    const char *tablename
     );
 
 bool miniSQL_dropTable(

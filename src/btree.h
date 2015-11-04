@@ -50,8 +50,8 @@ struct node
 {
     u32 parent;   // 4 byte
     /* The first 2 block is to store block info */
-    Data *datas=NULL;
-    u32 *childs=NULL;
+    Data *datas;
+    u32 *childs;
     u32 N;
     u32 nodeNo;     // 4 byte
     u32 next;

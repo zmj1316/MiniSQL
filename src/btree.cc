@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <string>
+#include <stdlib.h>
 #include <io.h>
 /* create index of {col} in {tb} named {idxname} */
 bool btree_create(const char * idxname, column *col)

@@ -89,7 +89,7 @@ bool Recordmanager_insertRecord(table* tb,record* entry)
     {
         newBlock(&(tb->buf));
     }
-    move_window(&(tb->buf),(++tb->recordNum - 1) / capacity + 1);
+    move_window(&(tb->buf),(++tb->recordNum - 1) / capacity);
     record2binary(tb, tb->buf.win + (tb->recordNum - 1) % capacity, entry);
     tb->buf.dirty = true;
     return true;

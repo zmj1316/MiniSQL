@@ -1,13 +1,10 @@
 CC = g++
-test: test.o btree.o buffer.o
-	$(CC) test.o btree.o buffer.o -o test
 
-	./test
-test.o: global.h test/test.cc btree.o
-	$(CC) -c test/test.cc
+
+
 btree.o: global.h btree.h btree.cc buffer.o 
 	$(CC) -c btree.cc
 buffer.o: global.h buffer.h buffer.cc
 	$(CC) -c buffer.cc
-clean:
-	if exist "0.idx" del 0.idx
+MiniSQL.o: global.h MiniSQL.h MiniSQL.cc buffer.o btree.o record.o catalog.o
+	$(CC) -c MiniSQL.cc
