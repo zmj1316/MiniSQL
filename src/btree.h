@@ -70,10 +70,10 @@ struct btree
 };
 typedef struct btree btree;
 //static void insert(btree *, node *);
-u32 btree_delete_node(
-    btree *,   // index name
-    Data*         // Filter
-    );
+//u32 btree_delete_node(
+//    btree *,   // index name
+//    Data*         // Filter
+//    );
 static bool getBtree(btree*, const char *);
 static void saveBtree(btree*);
 
@@ -84,7 +84,6 @@ static void saveNode(btree*, node *);
 
 static void findNode(btree*, node*, Data*);
 static void splitNode(btree*, node*source,node*dst);
-static void mergeNode(btree*, node*source, node*dst);
 
 static i8 cmp(dataType type, Data sourse,Data target);
 static void datacpy(btree* bt, Data *dst, Data *source);

@@ -15,7 +15,7 @@ int main()
     Data ii;
     char tmp[255];
     long long a = time(NULL);
-    for (size_t i = 0; i < 200000; i++)
+    for (size_t i = 0; i < 10000; i++)
     {
         //ii.data.i = i;
         sprintf(tmp, "Key%d", i);
@@ -24,10 +24,11 @@ int main()
     }
     printf("TIme:%llu\n", time(NULL) - a);
     Rule rr;
-    rr.cmp = LT;
+    rr.cmp = EQ;
     rr.colNo = 0;
     rr.target.str=new char[255];
     char *s = rr.target.str;
+    strcpy(s, "Key1007");
     for (size_t i = 0; i < 1990; i++)
     {
         sprintf(s, "Key%u", i);

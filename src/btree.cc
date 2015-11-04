@@ -189,7 +189,7 @@ u32 btree_delete_node(const char * idxname,Data * data)
                 next.N = size - (size / 2);
                 saveNode(&bt, &nd);
                 saveNode(&bt, &next);
-                refreshParents(&bt, &next.datas[0], next.parent,0);
+                refreshParents(&bt, &next.datas[0], next.parent, -1);
                 /* update parent of next */
                 //insertNonleaf(&bt, &next,next.parent);
             }
@@ -230,115 +230,118 @@ u32 btree_delete_node(const char * idxname,Data * data)
                 saveNode(&bt, &next);
                 refreshParents(&bt, &nd.datas[0], nd.parent,0);
             }
+            freeNode(&bt, &par);
         }
+        freeNode(&bt, &next);
 
     }
+    freeNode(&bt, &nd);
     saveBtree(&bt);
     return 1;
 }
-
-u32 btree_delete_node(btree* bt,Data * data)
-{
-    node nd;
-    /* find node to delete */
-    findNode(bt, &nd, data);
-    size_t i;
-    /* locate */
-    for (i = 0; i < nd.N && cmp(bt->type, nd.datas[i], *data) != 0; i++);
-    if (i>=nd.N )
-    {
-        fprintf(stderr, "No data to delete!\n");
-        return 0;
-    }
-    deleteData(bt, &nd, i);
-    saveNode(bt, &nd);
-    /* less than N/2 */
-    if (nd.N<bt->capacity/2 && nd.parent!=ROOTMARK)
-    {
-        node next;
-        if (nd.next!=NONEXT)                // find the next leaf
-        {
-            getNode(bt, &next, nd.next);
-            if (nd.N+next.N<=bt->capacity)   // merge nodes
-            {
-                if (nd.nodeNo==bt->head)
-                {
-                    bt->head = next.nodeNo;  // check if is head
-                }
-                /* move data */
-                for (size_t i = 0; i < nd.N; i++)
-                {
-                    insertData(bt, &next, i, &nd.datas[i], nd.childs[i]);
-                }
-                /* empty node */
-                nd.N = EMPTYBLOCK;
-                saveNode(bt, &next);
-                saveNode(bt, &nd);
-                deleteNonleaf(bt, &nd.datas[0], nd.parent);    // delete in parent
-                refreshBlock(bt);
-            }
-            else    // merge and split
-            {
-                u32 size = (nd.N + next.N);
-                //deleteNonleaf(&bt, &next.datas[0], next.parent);
-                /* move data */
-                u32 end = size / 2 - nd.N;
-                for (size_t i = 0; i < end; i++)
-                {
-                    insertData(bt, &nd, nd.N, &next.datas[0], next.childs[0]);
-                    deleteData(bt, &next, 0);
-                }
-                nd.N = size / 2;
-                next.N = size - (size / 2);
-                saveNode(bt, &nd);
-                saveNode(bt, &next);
-                refreshParents(bt, &next.datas[0], next.parent,0);
-                /* update parent of next */
-                //insertNonleaf(&bt, &next,next.parent);
-            }
-        }
-        else        // end block 
-        {
-            node par;
-            getNode(bt, &par, nd.parent);                  // get parent
-            getNode(bt, &next, par.childs[par.N - 2]);     // get previous block
-            freeNode(bt, &par);                            // free parent
-            if (nd.N + next.N <= bt->capacity)               // merge
-            {
-                /* move data */
-                for (size_t i = 0; i < nd.N; i++)
-                {
-                    insertData(bt, &next, next.N, &nd.datas[i], nd.childs[i]);
-                }
-                nd.N = EMPTYBLOCK;
-                saveNode(bt, &next);
-                saveNode(bt, &nd);
-                deleteNonleaf(bt, &nd.datas[0], nd.parent);// delete in parent
-                /* refresh block link */
-                refreshBlock(bt);
-            }
-            else    // merge and split
-            {
-                u32 size = (nd.N + next.N);                     
-                next.N = size - (size / 2);
-                u32 end = size / 2 - nd.N;
-                /* move data */
-                for (size_t i = 0; i < end; i++)
-                {
-                    insertData(bt,&nd,nd.N,&next.datas[next.N+i],next.childs[next.N+i]);
-                }
-                nd.N = size / 2;
-                /* update self in parent */
-                saveNode(bt, &nd);
-                saveNode(bt, &next);
-                refreshParents(bt, &nd.datas[0], nd.parent,0);
-            }
-        }
-
-    }
-    saveBtree(bt);
-    return 1;
-}
+//
+//u32 btree_delete_node(btree* bt,Data * data)
+//{
+//    node nd;
+//    /* find node to delete */
+//    findNode(bt, &nd, data);
+//    size_t i;
+//    /* locate */
+//    for (i = 0; i < nd.N && cmp(bt->type, nd.datas[i], *data) != 0; i++);
+//    if (i>=nd.N )
+//    {
+//        fprintf(stderr, "No data to delete!\n");
+//        return 0;
+//    }
+//    deleteData(bt, &nd, i);
+//    saveNode(bt, &nd);
+//    /* less than N/2 */
+//    if (nd.N<bt->capacity/2 && nd.parent!=ROOTMARK)
+//    {
+//        node next;
+//        if (nd.next!=NONEXT)                // find the next leaf
+//        {
+//            getNode(bt, &next, nd.next);
+//            if (nd.N+next.N<=bt->capacity)   // merge nodes
+//            {
+//                if (nd.nodeNo==bt->head)
+//                {
+//                    bt->head = next.nodeNo;  // check if is head
+//                }
+//                /* move data */
+//                for (size_t i = 0; i < nd.N; i++)
+//                {
+//                    insertData(bt, &next, i, &nd.datas[i], nd.childs[i]);
+//                }
+//                /* empty node */
+//                nd.N = EMPTYBLOCK;
+//                saveNode(bt, &next);
+//                saveNode(bt, &nd);
+//                deleteNonleaf(bt, &nd.datas[0], nd.parent);    // delete in parent
+//                refreshBlock(bt);
+//            }
+//            else    // merge and split
+//            {
+//                u32 size = (nd.N + next.N);
+//                //deleteNonleaf(&bt, &next.datas[0], next.parent);
+//                /* move data */
+//                u32 end = size / 2 - nd.N;
+//                for (size_t i = 0; i < end; i++)
+//                {
+//                    insertData(bt, &nd, nd.N, &next.datas[0], next.childs[0]);
+//                    deleteData(bt, &next, 0);
+//                }
+//                nd.N = size / 2;
+//                next.N = size - (size / 2);
+//                saveNode(bt, &nd);
+//                saveNode(bt, &next);
+//                refreshParents(bt, &next.datas[0], next.parent,0);
+//                /* update parent of next */
+//                //insertNonleaf(&bt, &next,next.parent);
+//            }
+//        }
+//        else        // end block 
+//        {
+//            node par;
+//            getNode(bt, &par, nd.parent);                  // get parent
+//            getNode(bt, &next, par.childs[par.N - 2]);     // get previous block
+//            freeNode(bt, &par);                            // free parent
+//            if (nd.N + next.N <= bt->capacity)               // merge
+//            {
+//                /* move data */
+//                for (size_t i = 0; i < nd.N; i++)
+//                {
+//                    insertData(bt, &next, next.N, &nd.datas[i], nd.childs[i]);
+//                }
+//                nd.N = EMPTYBLOCK;
+//                saveNode(bt, &next);
+//                saveNode(bt, &nd);
+//                deleteNonleaf(bt, &nd.datas[0], nd.parent);// delete in parent
+//                /* refresh block link */
+//                refreshBlock(bt);
+//            }
+//            else    // merge and split
+//            {
+//                u32 size = (nd.N + next.N);                     
+//                next.N = size - (size / 2);
+//                u32 end = size / 2 - nd.N;
+//                /* move data */
+//                for (size_t i = 0; i < end; i++)
+//                {
+//                    insertData(bt,&nd,nd.N,&next.datas[next.N+i],next.childs[next.N+i]);
+//                }
+//                nd.N = size / 2;
+//                /* update self in parent */
+//                saveNode(bt, &nd);
+//                saveNode(bt, &next);
+//                refreshParents(bt, &nd.datas[0], nd.parent,0);
+//            }
+//        }
+//
+//    }
+//    saveBtree(bt);
+//    return 1;
+//}
 
 set<u32> btree_select(const char* idxname, Rule * rule)
 {
@@ -378,13 +381,14 @@ set<u32> btree_select(const char* idxname, Rule * rule)
             }
             else
             {
-                break;
+                freeNode(&bt, &nd);
+                return res;
             }
         }
         head = nd.next;
     }
+    freeNode(&bt, &nd);
     return res;
-
 }
 
 /* get index attributes */
@@ -578,10 +582,7 @@ void splitNode(btree* bt, node* source, node* dst)
     }
 }
 
-void mergeNode(btree*, node* source, node* dst)
-{
 
-}
 
 /* compare two data */
 i8 cmp(dataType type, Data sourse, Data target)// 1: GT 0:EQ -1: LT
@@ -705,9 +706,9 @@ void travel(const char * str)
     u32 cur = bt.head;
     FILE *fp;
     fp = fopen("out.txt", "a");
+    node nd;
     while (cur != NONEXT)
     {
-        node nd;
         getNode(&bt, &nd, cur);
         for (size_t i = 0; i < nd.N; i++)
         {
@@ -719,6 +720,7 @@ void travel(const char * str)
     }
     fprintf(fp, "========================================\n");
     fclose(fp);
+    freeNode(&bt, &nd);
 }
 void travel2(const char* str)
 {
@@ -773,6 +775,7 @@ void deleteNonleaf(btree* bt,Data* data, u32 parent)
                 nnd.parent = ROOTMARK;
                 bt->root = nnd.nodeNo;
                 saveNode(bt, &nnd);
+                freeNode(bt, &nnd);
                 saveNode(bt, &nd);
             }
             return;
@@ -784,13 +787,13 @@ void deleteNonleaf(btree* bt,Data* data, u32 parent)
         node tmp;
         if (i<pd.N)     // found next node
         {
-            getNode(bt, &next, nd.childs[i]);
+            getNode(bt, &next, pd.childs[i]);
             if (nd.N + next.N <= bt->capacity)  // merge 
             {
-                for (size_t i = 0; i < nd.N; i++)
+                for (size_t ii = 0; ii < nd.N; ii++)
                 {
-                    insertData(bt, &next, i, &nd.datas[i], nd.childs[i]);
-                    getNode(bt, &tmp, nd.childs[i]);
+                    insertData(bt, &next, ii, &nd.datas[ii], nd.childs[ii]);
+                    getNode(bt, &tmp, nd.childs[ii]);
                     tmp.parent = next.nodeNo;
                     saveNode(bt, &tmp);
                 }
@@ -798,7 +801,7 @@ void deleteNonleaf(btree* bt,Data* data, u32 parent)
                 saveNode(bt, &next);
                 saveNode(bt, &nd);
                 deleteNonleaf(bt, &nd.datas[0], nd.parent);
-                getNode(bt, &next, nd.next);
+                getNode(bt, &next, pd.childs[i]);
                 refreshParents(bt, &next.datas[0], next.parent,0);
             }
             else        // merge and split
@@ -818,7 +821,7 @@ void deleteNonleaf(btree* bt,Data* data, u32 parent)
                 /* update parent */
                 saveNode(bt, &nd);
                 saveNode(bt, &next);
-                refreshParents(bt, &next.datas[0], next.parent,0);
+                refreshParents(bt, &next.datas[0], next.parent, -1);
             }
         }
         else        // end node
@@ -866,6 +869,7 @@ void deleteNonleaf(btree* bt,Data* data, u32 parent)
         freeNode(bt, &next);
         freeNode(bt, &tmp);
     }
+    freeNode(bt, &nd);
 }
 
 void refreshBlock(btree* bt)
@@ -887,6 +891,8 @@ void refreshBlock(btree* bt)
         }
         getNode(bt, &n0, n0.next);  
     }
+    freeNode(bt, &n0);
+    freeNode(bt, &n1);
 }
 
 void refreshParents(btree* bt, Data* data, u32 parent,u32 offset)
