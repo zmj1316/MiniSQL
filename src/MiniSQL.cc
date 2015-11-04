@@ -2,6 +2,7 @@
 #include "catalog.h"
 #include "recordmanager.h"
 #include <string.h>
+#include <stdio.h>
 #include <io.h>
 
 bool miniSQL_createTable(table* tb)

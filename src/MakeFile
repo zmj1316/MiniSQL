@@ -1,10 +1,21 @@
 CC = g++
-
-
-
-btree.o: global.h btree.h btree.cc buffer.o 
-	$(CC) -c btree.cc
+ss: lex.yy.o ra.tab.o test.cpp MiniSQL.o
+	g++  lex.yy.o ra.tab.o MiniSQL.o test.cpp 
+catalog.o: catalog.h catalog.cpp global.h MiniSQL.h
+	$(CC) -c catalog.cpp -o catalog.o
+btree.o: global.h btree.h btree.cc buffer.h buffer.o 
+	$(CC) -c buffer.o btree.cc
 buffer.o: global.h buffer.h buffer.cc
 	$(CC) -c buffer.cc
+record.o: global.h buffer.h buffer.o recordmanager.h recordmanager.cc
+	$(CC) -c buffer.o recordmanager.cc -o record.o
 MiniSQL.o: global.h MiniSQL.h MiniSQL.cc buffer.o btree.o record.o catalog.o
-	$(CC) -c MiniSQL.cc
+	$(CC) -c buffer.o btree.o record.o catalog.o MiniSQL.cc 
+lex.yy.o: lex.yy.c ra.tab.h
+	g++ -c lex.yy.c
+lex.yy.c: lex.l 
+	flex lex.l
+ra.tab.o: ra.tab.h ra.tab.c
+	g++ -c ra.tab.c
+ra.tab.c ra.tab.h: yacc.y
+	bison -dvt -b ra yacc.y
