@@ -16,7 +16,7 @@ bool btree_create(const char * idxname, column *col)
     }
     /* generate the index filename */
     char filename[259];
-    strcpy_s(filename, 255, idxname);
+    strcpy(filename,  idxname);
     strcat(filename,".idx");
     /* check the index file */
     if (_access(filename,0)==0)
@@ -397,7 +397,7 @@ bool getBtree(btree* bt_ptr, const char* idxname)
 {
     /* generate file name */
     char filename[259];
-    strcpy_s(filename, 255, idxname);
+    strcpy(filename,  idxname);
     strcat(filename, ".idx");
     /* check file */
     if (_access(filename, 0) != 0)

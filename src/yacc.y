@@ -19,6 +19,7 @@ void yyerror(const char* s){
 extern int32_t yylineno;
 int32_t yylex();
 table tb;
+record rcd;
 %}
 %token STRING 
 %token CREATE DROP SELECT INSERT DELETE QUIT EXEC
@@ -68,8 +69,7 @@ CREATE_S 	 : CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM {
 						tb.colNum_u64=0;
 					}
 				}
-				fprintf(stderr, "Primary Key not Exist!\n");
-				exit(0);
+				if(tb.colNum_u64 > 0){fprintf(stderr, "Primary Key %s not Exist!\n", (char*)$10);tb.colNum_u64=0;}
 				}
 			 | CREATE INDEX NAME ON NAME CC NAME CC TM;
 
@@ -78,7 +78,7 @@ ATTRS		 : ATTR 	{}
 			 ;
 
 ATTR 		 : NAME tCHAR CC INTEGER CC {
-				int i = ++tb.colNum_u64;
+				int i = tb.colNum_u64++;
 				column *col = &tb.col[i];
 				strcpy(col->name_str,(char*)$1);
 				col->type = CHAR;
@@ -86,7 +86,7 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 				col->size_u8 = *(long*)$4;
 }
 			 | NAME tCHAR CC INTEGER CC UNI{
-			 	int i = ++tb.colNum_u64;
+			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
 			 	strcpy(col->name_str,(char*)$1);
 			 	col->type = CHAR;
@@ -94,7 +94,7 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 			 	col->size_u8 = *(long*)$4;
 			 }
 			 | NAME tINT{
-			 	int i = ++tb.colNum_u64;
+			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
 			 	strcpy(col->name_str,(char*)$1);
 			 	col->type = INT;
@@ -102,7 +102,7 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 			 	col->size_u8 = 4;
 			 }
 			 | NAME tINT UNI{
-			 	int i = ++tb.colNum_u64;
+			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
 			 	strcpy(col->name_str,(char*)$1);
 			 	col->type = INT;
@@ -118,7 +118,7 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 			 	col->size_u8 = 4;
 			 }
 			 | NAME tFLOAT UNI{
-			 	int i = ++tb.colNum_u64;
+			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
 			 	strcpy(col->name_str,(char*)$1);
 			 	col->type = FLOAT;
@@ -127,12 +127,32 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 			 }
 			 ;
 
-INSERT_S     : INSERT INTO NAME VALUES CC VALUESS CC TM
+INSERT_S     : INSERT INTO NAME VALUES CC VALUESS CC TM{
+				table * tp = miniSQL_connectTable((const char*)$3);
+				if(tp == NULL) {fprintf(stderr,"Table Not Exist!\n"); return 0;}
+				miniSQL_insert(tp, &rcd);
+				miniSQL_disconnectTable(tp);
+}
 			  ;
 
-VALUE 		 : STRING	{puts((char*)$1);}
-			 | INTEGER	{printf("%d\n",*(int*)$1);}
-			 | FF		{printf("%f\n",*(float*)$1);}
+VALUE 		 : STRING	{
+					item i;
+					i.type = CHAR;
+					i.data.str = (char*)$1;
+					rcd.i.push_back(i);
+					}
+			 | INTEGER	{
+			 		item i;
+			 		i.type = INT;
+			 		i.data.i = *(int*)$1;
+			 		rcd.i.push_back(i);
+			 }
+			 | FF		{
+			 		item i;
+			 		i.type = FLOAT;
+			 		i.data.f = *(float*)$1;
+			 		rcd.i.push_back(i);
+			 }
 			 ;
 
 VALUESS      : VALUE

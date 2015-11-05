@@ -79,4 +79,5 @@ int main()
     ii.data.i = 100;
     rcd.i.push_back(ii);
     miniSQL_insert(tt, &rcd);
+    miniSQL_disconnectTable(tt);
 }

@@ -1,14 +1,41 @@
 #ifndef _RECORDMANAGER_H
 #define _RECORDMANAGER_H
-#include "MiniSQL.h"
-/* Convert a record in block into a record */
-/* Warnning: there's a valid flag before each record binary!*/
-static record binary2record(table *, u8 *);
-static bool record2binary(table *, u8 *, record *);
+#include"MiniSQL.h"
+#include"global.h"
 
+bool Recordmanager_insertRecord(
+    table* tab,
+    record* rcd
+    );
 
-vector<record> Recordmanager_getRecord(table *tb);   
-bool Recordmanager_insertRecord(table *tb, record *);
+bool Recordmanager_insertRecordwithIndex(
+    table *tab,
+    record *rcd,
+    vector<const char *> idxname,
+    vector<u32> idx
+    );
 
+int Recordmanager_deleteRecord(
+    table* tab,
+    Filter *flt
+    );
 
-#endif // _RECORDMANAGER_H
+int Recordmanager_deleteRecordwithIndex(
+    table* tab,
+    Filter *flt,
+    vector<const char *> idxname,
+    vector<u32> idx
+    );
+
+vector<record> Recordmanager_selectRecord(
+    table* tab,
+    Filter* flt
+    );
+
+vector<record> Recordmanager_selectRecordwithIndex(table* tab,
+    Filter *flt,
+    const char *idxname,
+    Rule *rule
+    );
+
+#endif

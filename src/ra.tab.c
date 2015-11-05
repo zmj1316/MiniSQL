@@ -90,10 +90,11 @@ void yyerror(const char* s){
 extern int32_t yylineno;
 int32_t yylex();
 table tb;
+record rcd;
 
 
 /* Line 189 of yacc.c  */
-#line 97 "ra.tab.c"
+#line 98 "ra.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -175,7 +176,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 179 "ra.tab.c"
+#line 180 "ra.tab.c"
 
 #ifdef short
 # undef short
@@ -480,11 +481,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    30,    30,    33,    34,    37,    38,    39,    40,    41,
-      42,    45,    46,    49,    50,    53,    54,    55,    60,    74,
-      76,    77,    80,    88,    96,   104,   112,   120,   130,   133,
-     134,   135,   138,   139,   142,   143,   144,   145,   146,   147,
-     150,   151,   153,   154
+       0,    31,    31,    34,    35,    38,    39,    40,    41,    42,
+      43,    46,    47,    50,    51,    54,    55,    56,    61,    75,
+      77,    78,    81,    89,    97,   105,   113,   121,   131,   139,
+     145,   151,   159,   160,   163,   164,   165,   166,   167,   168,
+     171,   172,   174,   175
 };
 #endif
 
@@ -1443,80 +1444,81 @@ yyreduce:
         case 5:
 
 /* Line 1455 of yacc.c  */
-#line 37 "yacc.y"
+#line 38 "yacc.y"
     {printf("select\n");;}
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 38 "yacc.y"
+#line 39 "yacc.y"
     {printf("create\n");;}
     break;
 
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 39 "yacc.y"
+#line 40 "yacc.y"
     {printf("drop\n");;}
     break;
 
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 40 "yacc.y"
+#line 41 "yacc.y"
     {printf("delete\n");;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 41 "yacc.y"
+#line 42 "yacc.y"
     {printf("insert\n");;}
     break;
 
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 42 "yacc.y"
+#line 43 "yacc.y"
     {exit(0);;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 45 "yacc.y"
+#line 46 "yacc.y"
     {;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 53 "yacc.y"
+#line 54 "yacc.y"
     {puts("TAR");;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 54 "yacc.y"
+#line 55 "yacc.y"
     {puts("TAR");;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 55 "yacc.y"
+#line 56 "yacc.y"
     {puts((char*)(yyvsp[(1) - (1)]));;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 60 "yacc.y"
+#line 61 "yacc.y"
     {
 				strcpy(tb.name_str,(char*)(yyvsp[(3) - (13)]));
 				for(int i = 0; i < tb.colNum_u64;i++){
+					puts(tb.col[i].name_str);
 					if (strcmp((char*)(yyvsp[(10) - (13)]),tb.col[i].name_str) == 0)
 					{
 						tb.primarykey_u8 = i;
@@ -1525,31 +1527,30 @@ yyreduce:
 						tb.colNum_u64=0;
 					}
 				}
-				fprintf(stderr, "Primary Key not Exist!\n");
-				exit(0);
+				if(tb.colNum_u64 > 0){fprintf(stderr, "Primary Key %s not Exist!\n", (char*)(yyvsp[(10) - (13)]));tb.colNum_u64=0;}
 				;}
     break;
 
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 76 "yacc.y"
+#line 77 "yacc.y"
     {;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 77 "yacc.y"
+#line 78 "yacc.y"
     {;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 80 "yacc.y"
+#line 81 "yacc.y"
     {
-				int i = ++tb.colNum_u64;
+				int i = tb.colNum_u64++;
 				column *col = &tb.col[i];
 				strcpy(col->name_str,(char*)(yyvsp[(1) - (5)]));
 				col->type = CHAR;
@@ -1561,9 +1562,9 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 88 "yacc.y"
+#line 89 "yacc.y"
     {
-			 	int i = ++tb.colNum_u64;
+			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
 			 	strcpy(col->name_str,(char*)(yyvsp[(1) - (6)]));
 			 	col->type = CHAR;
@@ -1575,9 +1576,9 @@ yyreduce:
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 96 "yacc.y"
+#line 97 "yacc.y"
     {
-			 	int i = ++tb.colNum_u64;
+			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
 			 	strcpy(col->name_str,(char*)(yyvsp[(1) - (2)]));
 			 	col->type = INT;
@@ -1589,9 +1590,9 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 104 "yacc.y"
+#line 105 "yacc.y"
     {
-			 	int i = ++tb.colNum_u64;
+			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
 			 	strcpy(col->name_str,(char*)(yyvsp[(1) - (3)]));
 			 	col->type = INT;
@@ -1603,7 +1604,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 112 "yacc.y"
+#line 113 "yacc.y"
     {
 			 	int i = ++tb.colNum_u64;
 			 	column *col = &tb.col[i];
@@ -1617,9 +1618,9 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 120 "yacc.y"
+#line 121 "yacc.y"
     {
-			 	int i = ++tb.colNum_u64;
+			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
 			 	strcpy(col->name_str,(char*)(yyvsp[(1) - (3)]));
 			 	col->type = FLOAT;
@@ -1628,80 +1629,107 @@ yyreduce:
 			 ;}
     break;
 
+  case 28:
+
+/* Line 1455 of yacc.c  */
+#line 131 "yacc.y"
+    {
+				table * tp = miniSQL_connectTable((const char*)(yyvsp[(3) - (8)]));
+				if(tp == NULL) {fprintf(stderr,"Table Not Exist!\n"); return 0;}
+				miniSQL_insert(tp, &rcd);
+				miniSQL_disconnectTable(tp);
+;}
+    break;
+
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 133 "yacc.y"
-    {puts((char*)(yyvsp[(1) - (1)]));;}
+#line 139 "yacc.y"
+    {
+					item i;
+					i.type = CHAR;
+					i.data.str = (char*)(yyvsp[(1) - (1)]);
+					rcd.i.push_back(i);
+					;}
     break;
 
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 134 "yacc.y"
-    {printf("%d\n",*(int*)(yyvsp[(1) - (1)]));;}
+#line 145 "yacc.y"
+    {
+			 		item i;
+			 		i.type = INT;
+			 		i.data.i = *(int*)(yyvsp[(1) - (1)]);
+			 		rcd.i.push_back(i);
+			 ;}
     break;
 
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 135 "yacc.y"
-    {printf("%f\n",*(float*)(yyvsp[(1) - (1)]));;}
+#line 151 "yacc.y"
+    {
+			 		item i;
+			 		i.type = FLOAT;
+			 		i.data.f = *(float*)(yyvsp[(1) - (1)]);
+			 		rcd.i.push_back(i);
+			 ;}
     break;
 
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 142 "yacc.y"
+#line 163 "yacc.y"
     {puts("FL");;}
     break;
 
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 143 "yacc.y"
+#line 164 "yacc.y"
     {puts("FL");;}
     break;
 
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 144 "yacc.y"
+#line 165 "yacc.y"
     {puts("FL");;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 145 "yacc.y"
+#line 166 "yacc.y"
     {puts("FL");;}
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 146 "yacc.y"
+#line 167 "yacc.y"
     {puts("FL");;}
     break;
 
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 147 "yacc.y"
+#line 168 "yacc.y"
     {puts("FL");;}
     break;
 
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 153 "yacc.y"
+#line 174 "yacc.y"
     {;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1705 "ra.tab.c"
+#line 1733 "ra.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1913,6 +1941,6 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 156 "yacc.y"
+#line 177 "yacc.y"
 
 

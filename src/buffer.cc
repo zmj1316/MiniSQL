@@ -7,7 +7,7 @@
 static void diskWrite(Buffer *buf, u32 block,u8 *bin)
 {
     FILE *fp;
-    fopen_s(&fp,buf->filename, "rb+");
+    fp = fopen(buf->filename, "rb+");
     fseek(fp, block*BLOCKSIZE, SEEK_SET);
     fwrite(bin, BLOCKSIZE, 1, fp);
     fclose(fp);
@@ -16,7 +16,7 @@ static void diskWrite(Buffer *buf, u32 block,u8 *bin)
 static void diskRead(Buffer* buf, u32 block, u8* bin)
 {
     FILE *fp;
-    fopen_s(&fp,buf->filename, "rb");
+    fp = fopen(buf->filename, "rb");
     fseek(fp, block*BLOCKSIZE, SEEK_SET);
     fread(bin, BLOCKSIZE, 1, fp);
     fclose(fp);
@@ -24,7 +24,7 @@ static void diskRead(Buffer* buf, u32 block, u8* bin)
 
 void buffer_init(Buffer*buf, const char* filename)
 {
-    strcpy_s(buf->filename,255,filename);
+    strcpy(buf->filename,filename);
     buf->dirty = false;
     buf->winptr = -1;
     for (size_t i = 0; i < CACHESIZE; i++)
@@ -84,7 +84,7 @@ void move_window(Buffer* buf, u32 block)
 void newBlock(Buffer* buf)
 {
     FILE *fp;
-    fopen_s(&fp,buf->filename, "ab");
+    fp = fopen(buf->filename, "ab");
     fseek(fp, BLOCKSIZE, SEEK_END);
     fclose(fp);
 }

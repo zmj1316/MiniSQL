@@ -78,7 +78,7 @@ ws       [ \t]+
 "on"        {return ON;}
 {id} {
   yylval = _strdup(yytext);
-  // puts((char*)yylval);
+  puts((char*)yylval);
   return NAME;
 }
 

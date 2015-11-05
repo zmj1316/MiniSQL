@@ -1053,7 +1053,7 @@ YY_RULE_SETUP
 #line 79 "lex.l"
 {
   yylval = _strdup(yytext);
-  // puts((char*)yylval);
+  puts((char*)yylval);
   return NAME;
 }
 	YY_BREAK
