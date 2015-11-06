@@ -146,6 +146,9 @@ CREATE_S 	 : CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM {
 					}
 				}
 				if(tb.colNum_u64 > 0){fprintf(stderr, "Primary Key %s not Exist!\n", (char*)$10);tb.colNum_u64=0;}
+				tb.name_str[0]=0;
+				tb.colNum_u64=0;
+				tb.recordSize = 0;
 				}
 			 | CREATE INDEX NAME ON NAME CC NAME CC TM;
 
@@ -159,7 +162,8 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 				strcpy(col->name_str,(char*)$1);
 				col->type = CHAR;
 				col->unique_u8 = 0;
-				col->size_u8 = *(long*)$4;
+				col->size_u8 = *(long*)$4 + 1;
+				tb.recordSize+=col->size_u8;
 }
 			 | NAME tCHAR CC INTEGER CC UNI{
 			 	int i = tb.colNum_u64++;
@@ -167,7 +171,9 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 			 	strcpy(col->name_str,(char*)$1);
 			 	col->type = CHAR;
 			 	col->unique_u8 = 1;
-			 	col->size_u8 = *(long*)$4;
+			 	col->size_u8 = *(long*)$4 + 1;
+				tb.recordSize+=col->size_u8;
+
 			 }
 			 | NAME tINT{
 			 	int i = tb.colNum_u64++;
@@ -176,6 +182,8 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 			 	col->type = INT;
 			 	col->unique_u8 = 0;
 			 	col->size_u8 = 4;
+				tb.recordSize+=col->size_u8;
+
 			 }
 			 | NAME tINT UNI{
 			 	int i = tb.colNum_u64++;
@@ -184,14 +192,18 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 			 	col->type = INT;
 			 	col->unique_u8 = 1;
 			 	col->size_u8 = 4;
+				tb.recordSize+=col->size_u8;
+
 			 }
 			 | NAME tFLOAT{
-			 	int i = ++tb.colNum_u64;
+			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
 			 	strcpy(col->name_str,(char*)$1);
 			 	col->type = FLOAT;
 			 	col->unique_u8 = 0;
 			 	col->size_u8 = 4;
+				tb.recordSize+=col->size_u8;
+
 			 }
 			 | NAME tFLOAT UNI{
 			 	int i = tb.colNum_u64++;
@@ -200,6 +212,8 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 			 	col->type = FLOAT;
 			 	col->unique_u8 = 1;
 			 	col->size_u8 = 4;
+				tb.recordSize+=col->size_u8;
+
 			 }
 			 ;
 
@@ -220,6 +234,7 @@ INSERT_S     : INSERT INTO NAME VALUES CC VALUESS CC TM{
 				}
 				miniSQL_insert(tp, &rcd);
 				miniSQL_disconnectTable(tp);
+				rcd.i.empty();
 }
 			  ;
 
@@ -255,7 +270,43 @@ FL 			 : mLE	{cmp = LE;}
 			 | mGT	{cmp = GT;}
 			 ;
 
-DELETE_S	 : DELETE FROM NAME WHERE TJS TM
+DELETE_S	 : DELETE FROM NAME WHERE TJS TM{
+				table *tb;
+				puts("deletes");
+				if((tb = miniSQL_connectTable((char*)$4)) == NULL){
+					fprintf(stderr,"table not exist.");
+					return 0;
+				}
+				Rule rule;
+				for (vector<TData>::iterator i = Tdatas.begin();i!=Tdatas.end();++i){
+					for(int i0 = 0; i0 < tb->colNum_u64;++i0){
+						if(0==strcmp((*i).name,tb->col[i0].name_str)){
+							if((*i).i.type==tb->col[i0].type){
+								rule.colNo = i0;
+								rule.cmp = (*i).cmp;
+								rule.target = (*i).i.data;
+								break;
+							}
+							else if((*i).i.type == INT && tb->col[i0].type == FLOAT){
+								rule.colNo = i0;
+								rule.cmp = (*i).cmp;
+								rule.target.f = (float)(*i).i.data.i;
+								break;
+							}
+							else{
+								fprintf(stderr,"type of %s not match!",(*i).name);
+								return 0;
+							}
+						}
+					}
+					filter.rules.push_back(rule);
+				}
+				miniSQL_delete(tb,&filter);
+				filter.rules.empty();
+				Tdatas.empty();
+				return 1;
+				
+}
 			 | DELETE FROM NAME TM
 
 DROP_S   	 : DROP TABLE NAME TM{}

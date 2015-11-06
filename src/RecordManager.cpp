@@ -6,6 +6,10 @@
 #include"MiniSQL.h"
 #include"buffer.h"
 #include"global.h"
+#include <stdlib.h>
+#include <memory.h>
+#include <string.h> 
+#include <stdio.h>
 using namespace std;
 
 void *mallocZero(int n) {
@@ -53,35 +57,37 @@ u8 Rule_cmp(dataType type, Data* s, Data* dst, Compare c)
     }
 }
 
-static record *binary2record(table* tab, u8* bin)
+static record binary2record(table* tab, u8* bin)
 {
-    record *result = (record *)mallocZero(sizeof(record));
+    record result;
     if ((*bin) == 0x0)
     {
-        result->valid = false;
+        result.valid = false;
         return result;
     }
     bin++;
-    result->valid = true;
+    result.valid = true;
+    item it;
     for (int i = 0; i < tab->colNum_u64; i++)
     {
+        
         column *col = &(tab->col[i]);
-        result->i[i].type = col->type;
         switch (col->type)
         {
         case INT:
-            result->i[i].data.i = *(int *)bin;
+            it.data.i = *(int *)bin;
             break;
         case FLOAT:
-            result->i[i].data.f = *(float*)bin;
+            it.data.f = *(float*)bin;
             break;
         case CHAR:
-            result->i[i].data.str = (char *)mallocZero(col->size_u8);
-            memcpy(result->i[i].data.str, (char *)bin, col->size_u8);/* Mem leap! */
+            it.data.str = (char *)mallocZero(col->size_u8);
+            memcpy(it.data.str, (char *)bin, col->size_u8);/* Mem leap! */
             break;
         default:
             break;
         }
+        result.i.push_back(it);
         bin += col->size_u8;
     }
     return result;
@@ -108,6 +114,7 @@ static bool record2binary(table *tab, u8 *bin, record *entry)
         default:
             break;
         }
+        bin += col->size_u8;
     }
     return true;
 }
@@ -139,34 +146,37 @@ bool Recordmanager_insertRecord(table* tab, record* rcd)
             }
         }
     }
-
-    u32 recordcount = 0;
-    u32 capacity = BLOCKSIZE / (tab->recordSize + 1);
-    for (size_t block = 0; recordcount < tab->recordNum; block++)
+    const u32 capacity = BLOCKSIZE / (tab->recordSize + 1);
+    if (vct.size()!=0)  // check unique
     {
-        move_window(&tab->buf, block);
-        for (size_t i = 0; i < capacity; i++)
+        u32 recordcount = 0;
+        for (size_t block = 0; recordcount < tab->recordNum; block++)
         {
-            u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
-            record *r = binary2record(tab, bin);
-            if (r->valid == false)
+            move_window(&tab->buf, block);
+            for (size_t i = 0; i < capacity; i++)
             {
-                continue;
-            }
-            else
-            {
-                recordcount++;
-            }
-            for (vector<u32>::iterator it = vct.begin(); it != vct.end();++it)
-            {
-                if (Rule_cmp(tab->col[*it].type, &r->i[*it].data, &rcd->i[*it].data, EQ))
+                u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
+                record r = binary2record(tab, bin);
+                if (r.valid == false)
                 {
-                    fprintf(stderr, "Unique check failure.");
-                    return false;
+                    continue;
+                }
+                else
+                {
+                    recordcount++;
+                }
+                for (vector<u32>::iterator it = vct.begin(); it != vct.end(); ++it)
+                {
+                    if (Rule_cmp(tab->col[*it].type, &r.i[*it].data, &rcd->i[*it].data, EQ))
+                    {
+                        fprintf(stderr, "Unique check failure.");
+                        return false;
+                    }
                 }
             }
         }
     }
+    
     // alloc new block
     if (tab->recordNum % capacity == 0)
     {
@@ -278,8 +288,8 @@ int Recordmanager_deleteRecord(table *tab, Filter *filter)
         for (size_t i = 0; i < capacity; i++)
         {
             u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
-            record *r = binary2record(tab, bin);
-            if (r->valid == false)
+            record r = binary2record(tab, bin);
+            if (r.valid == false)
             {
                 continue;
             }
@@ -291,7 +301,7 @@ int Recordmanager_deleteRecord(table *tab, Filter *filter)
             for (vector<Rule>::iterator it = filter->rules.begin(); it != filter->rules.end(); ++it)
             {
                 Rule rule = (*it);
-                if (0 == Rule_cmp(r->i[rule.colNo].type, &r->i[rule.colNo].data, &rule.target, rule.cmp))
+                if (0 == Rule_cmp(r.i[rule.colNo].type, &r.i[rule.colNo].data, &rule.target, rule.cmp))
                 {
                     res = false;
                     break;
@@ -308,7 +318,7 @@ int Recordmanager_deleteRecord(table *tab, Filter *filter)
                     vector<u32>::iterator idxit;
                     for (idxnameit = idxnames.begin(), idxit = colNums.begin(); idxnameit != idxnames.end() && idxit != colNums.end(); ++idxnameit, ++idxit)
                     {
-                        btree_delete_node(*idxnameit, &r->i[*idxit].data);
+                        btree_delete_node(*idxnameit, &r.i[*idxit].data);
                     }
                 }
             }
@@ -428,8 +438,8 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
             for (size_t i = 0; i < capacity; i++)
             {
                 u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
-                record *r = binary2record(tab, bin);
-                if (r->valid == false)
+                record r = binary2record(tab, bin);
+                if (r.valid == false)
                 {
                     continue;
                 }
@@ -437,7 +447,7 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
                 for (vector<Rule>::iterator it = flt->rules.begin(); it != flt->rules.end(); ++it)
                 {
                     Rule rule = (*it);
-                    if (0 == Rule_cmp(r->i[rule.colNo].type, &r->i[rule.colNo].data, &rule.target, rule.cmp))
+                    if (0 == Rule_cmp(r.i[rule.colNo].type, &r.i[rule.colNo].data, &rule.target, rule.cmp))
                     {
                         res = false;
                         break;
@@ -445,7 +455,7 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
                 }
                 if (res)// match 
                 {
-                    result.push_back(*r);
+                    result.push_back(r);
                 }
             }
 
@@ -461,20 +471,16 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
             for (size_t i = 0; i < capacity; i++)
             {
                 u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
-                record *r = binary2record(tab, bin);
-                if (r->valid == false)
+                record r = binary2record(tab, bin);
+                if (r.valid == false)
                 {
                     continue;
-                }
-                else
-                {
-                    recordcount++;
                 }
                 bool res = true;
                 for (vector<Rule>::iterator it = flt->rules.begin(); it != flt->rules.end(); ++it)
                 {
                     Rule rule = (*it);
-                    if (0 == Rule_cmp(r->i[rule.colNo].type, &r->i[rule.colNo].data, &rule.target, rule.cmp))
+                    if (0 == Rule_cmp(r.i[rule.colNo].type, &r.i[rule.colNo].data, &rule.target, rule.cmp))
                     {
                         res = false;
                         break;
@@ -482,8 +488,9 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
                 }
                 if (res)// match 
                 {
-                    result.push_back(*r);
+                    result.push_back(r);
                 }
+                if (++recordcount >= tab->recordNum) return result;
             }
         }
     }

@@ -56,29 +56,53 @@ int test_btree_main()
     system("pause");
     return 0;
 }
-
+void addColumn(table *tb, const char * colname, dataType type, const char * idxname,
+    u8 size,u8 unique)
+{
+    column * col = &tb->col[tb->colNum_u64];
+    strcpy(col->name_str, colname);
+    col->type = type;
+    strcpy(col->idxname, idxname);
+    col->size_u8 = size;
+    col->unique_u8 = unique==1;
+    tb->colNum_u64++;
+    tb->recordSize += size;
+}
 int main()
 {
     table tb;
-    strcpy(tb.name_str, "TestTb");
-    tb.primarykey_u8 = 0;
-    tb.recordSize = 4;
+    memset(&tb, 0, sizeof(table));
+    tb.recordSize = 0;
     tb.recordNum = 0;
-    column * col = tb.col;;
-    col->type = INT;
-    col->idxname[0] = 0;
-    strcpy(col->name_str, "col0");
-    col->size_u8 = 4;
-    col->unique_u8 = 0;
-    tb.colNum_u64 = 1;
+    strcpy(tb.name_str, "student");
+    addColumn(&tb, "sno", CHAR, "", 9, 1);
+    addColumn(&tb, "sname", CHAR,"", 17, 1);
+    addColumn(&tb, "sage", INT, "", 4, 0);
+    addColumn(&tb, "sgender", CHAR, "", 2, 0);
+    addColumn(&tb, "score", FLOAT, "", 4, 0);
     miniSQL_createTable(&tb);
-    table* tt = miniSQL_connectTable("TestTb");
-    record rcd;
-    item ii;
-    ii.type = INT;
-    ii.data.i = 100;
-    rcd.i.push_back(ii);
-    miniSQL_insert(tt, &rcd);
+    table* tt = miniSQL_connectTable("student");
+    record r;
+    item i;
+    i.type = CHAR;
+    i.data.str = "12345678";
+    r.i.push_back(i);
+    i.data.str = "wy1";
+    r.i.push_back(i);
+    i.type = INT;
+    i.data.i = 22;
+    r.i.push_back(i);
+    i.type = CHAR;
+    i.data.str = "M";
+    r.i.push_back(i);
+    i.type = FLOAT;
+    i.data.f = 95;
+    r.i.push_back(i);
+    miniSQL_insert(tt, &r);
+    r.i[0].data.str = "12345679";
+    miniSQL_insert(tt, &r);
     miniSQL_disconnectTable(tt);
+    tt = miniSQL_connectTable("student");
+    miniSQL_select(tt, new Filter);
     return 0;
 }

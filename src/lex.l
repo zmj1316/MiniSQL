@@ -85,7 +85,10 @@ ws       [ \t]+
 [()] {return CC;}
 
 \'[a-zA-Z0-9_]*\' {
-  yylval = _strdup(yytext);
+  char *tmp =  _strdup(yytext);
+  tmp[strlen(tmp) - 1]=0;
+  yylval = tmp+1;
+  puts((char*)yylval);
   return STRING;
 }
 
