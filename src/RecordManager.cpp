@@ -1,7 +1,3 @@
-#include<iostream>
-#include<string>
-#include<vector>
-#include<set>
 #include"btree.h"
 #include"MiniSQL.h"
 #include"buffer.h"
@@ -10,6 +6,8 @@
 #include <memory.h>
 #include <string.h> 
 #include <stdio.h>
+#include<vector>
+#include<set>
 using namespace std;
 
 void *mallocZero(int n) {
@@ -68,7 +66,7 @@ static record binary2record(table* tab, u8* bin)
     bin++;
     result.valid = true;
     item it;
-    for (int i = 0; i < tab->colNum_u64; i++)
+    for (u32 i = 0; i < tab->colNum_u64; i++)
     {
         
         column *col = &(tab->col[i]);
@@ -96,7 +94,7 @@ static record binary2record(table* tab, u8* bin)
 static bool record2binary(table *tab, u8 *bin, record *entry)
 {
     *bin++ = 0xFF;/* valid = true */
-    for (int i = 0; i < tab->colNum_u64; i++)
+    for (u32 i = 0; i < tab->colNum_u64; i++)
     {
         column *col = &(tab->col[i]);
         item *it = &(entry->i[i]);
@@ -136,7 +134,7 @@ bool Recordmanager_insertRecord(table* tab, record* rcd)
                 r.colNo = k;
                 if (btree_select(tab->col[k].idxname, &r).size() != 0)
                 {
-                    fprintf(stderr, "Unique check failure.");
+                    fprintf(stderr, "Unique check failure at index %s\n.", tab->col[k].idxname);
                     return false;
                 }
             }
@@ -167,9 +165,10 @@ bool Recordmanager_insertRecord(table* tab, record* rcd)
                 }
                 for (vector<u32>::iterator it = vct.begin(); it != vct.end(); ++it)
                 {
-                    if (Rule_cmp(tab->col[*it].type, &r.i[*it].data, &rcd->i[*it].data, EQ))
+                    if (Rule_cmp(tab->col[*it].type, &r.i[*it].data, &rcd->i[*it].data, EQ) == 1)
                     {
-                        fprintf(stderr, "Unique check failure.");
+                        fprintf(stderr, "Unique check failure at %s.\n",tab->col[*it].name_str);
+                        fprintf(stderr, "%s || %s \n", r.i[*it].data.str, rcd->i[*it].data.str);
                         return false;
                     }
                 }
@@ -184,7 +183,7 @@ bool Recordmanager_insertRecord(table* tab, record* rcd)
     }
     // insert
     move_window(&(tab->buf), (++tab->recordNum - 1) / capacity);
-    record2binary(tab, tab->buf.win + (tab->recordNum - 1) % capacity, rcd);
+    record2binary(tab, tab->buf.win + (tab->recordNum - 1) % capacity * (tab->recordSize + 1), rcd);
     tab->buf.dirty = true;
     sync_window(&tab->buf);
     // check index
@@ -279,47 +278,38 @@ int Recordmanager_deleteRecord(table *tab, Filter *filter)
             idxnames.push_back(tab->col[i].idxname);
         }
     }
-    record *rcd;
-    int capacity = BLOCKSIZE / (tab->recordSize + 1);
-    u32 recordcount = 0;
-    for (size_t block = 0; recordcount < tab->recordNum; block++)
+    u32 capacity = BLOCKSIZE / (tab->recordSize + 1);
+    for (size_t i = 0; i < tab->recordNum; i++)
     {
-        move_window(&tab->buf, block);
-        for (size_t i = 0; i < capacity; i++)
+        move_window(&tab->buf, i / capacity);
+        u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
+        record r = binary2record(tab, bin);
+        if (r.valid == false)
         {
-            u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
-            record r = binary2record(tab, bin);
-            if (r.valid == false)
+            continue;
+        }
+        bool res = true;
+        for (vector<Rule>::iterator it = filter->rules.begin(); it != filter->rules.end(); ++it)
+        {
+            Rule rule = (*it);
+            if (0 == Rule_cmp(r.i[rule.colNo].type, &r.i[rule.colNo].data, &rule.target, rule.cmp))
             {
-                continue;
+                res = false;
+                break;
             }
-            else
+        }
+        if (res)// match 
+        {
+            *bin = 0;// valid = false
+            tab->buf.dirty = true;
+            num++;
+            if (colNums.size() != 0)      // index exists
             {
-                recordcount++;
-            }
-            bool res = true;
-            for (vector<Rule>::iterator it = filter->rules.begin(); it != filter->rules.end(); ++it)
-            {
-                Rule rule = (*it);
-                if (0 == Rule_cmp(r.i[rule.colNo].type, &r.i[rule.colNo].data, &rule.target, rule.cmp))
+                vector<const char *>::iterator idxnameit;
+                vector<u32>::iterator idxit;
+                for (idxnameit = idxnames.begin(), idxit = colNums.begin(); idxnameit != idxnames.end() && idxit != colNums.end(); ++idxnameit, ++idxit)
                 {
-                    res = false;
-                    break;
-                }
-            }
-            if (res)// match 
-            {
-                *bin = 0;// valid = false
-                tab->buf.dirty = true;
-                num++;
-                if (colNums.size() != 0)      // index exists
-                {
-                    vector<const char *>::iterator idxnameit;
-                    vector<u32>::iterator idxit;
-                    for (idxnameit = idxnames.begin(), idxit = colNums.begin(); idxnameit != idxnames.end() && idxit != colNums.end(); ++idxnameit, ++idxit)
-                    {
-                        btree_delete_node(*idxnameit, &r.i[*idxit].data);
-                    }
+                    btree_delete_node(*idxnameit, &r.i[*idxit].data);
                 }
             }
         }
@@ -418,7 +408,7 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
     u32 colidx = -1;
     Rule *r = NULL;
     vector<record> result;
-    int capacity = BLOCKSIZE / (tab->recordSize + 1);
+    u32 capacity = BLOCKSIZE / (tab->recordSize + 1);
 
     for (vector<Rule>::iterator it = flt->rules.begin(); it != flt->rules.end(); ++it)
     {
@@ -464,33 +454,28 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
     }
     else    // without index
     {
-        u32 recordcount = 0;
-        for (size_t block = 0; recordcount < tab->recordNum; block++)
+        for (size_t i = 0; i < tab->recordNum; i++)
         {
-            move_window(&tab->buf, block);
-            for (size_t i = 0; i < capacity; i++)
+            move_window(&tab->buf, i / capacity);
+            u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
+            record r = binary2record(tab, bin);
+            if (r.valid == false)
             {
-                u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
-                record r = binary2record(tab, bin);
-                if (r.valid == false)
+                continue;
+            }
+            bool res = true;
+            for (vector<Rule>::iterator it = flt->rules.begin(); it != flt->rules.end(); ++it)
+            {
+                Rule rule = (*it);
+                if (0 == Rule_cmp(r.i[rule.colNo].type, &r.i[rule.colNo].data, &rule.target, rule.cmp))
                 {
-                    continue;
+                    res = false;
+                    break;
                 }
-                bool res = true;
-                for (vector<Rule>::iterator it = flt->rules.begin(); it != flt->rules.end(); ++it)
-                {
-                    Rule rule = (*it);
-                    if (0 == Rule_cmp(r.i[rule.colNo].type, &r.i[rule.colNo].data, &rule.target, rule.cmp))
-                    {
-                        res = false;
-                        break;
-                    }
-                }
-                if (res)// match 
-                {
-                    result.push_back(r);
-                }
-                if (++recordcount >= tab->recordNum) return result;
+            }
+            if (res)// match 
+            {
+                result.push_back(r);
             }
         }
     }
@@ -522,3 +507,20 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
 //    tab->buf.dirty = true;
 //    return result;
 //}
+bool Recordmanager_addindex(table* tb,const char * idxname,u32 colidx)
+{
+    bool rc = true;
+    u32 capacity = BLOCKSIZE / (tb->recordSize + 1);
+    for (size_t i = 0; i < tb->recordNum; i++)
+    {
+        move_window(&tb->buf, i / capacity);
+        u8 *bin = tb->buf.win + i * (tb->recordSize + 1);
+        record r = binary2record(tb, bin);
+        if (r.valid == false)
+        {
+            continue;
+        }
+        rc &= btree_insert(idxname, &r.i[colidx].data, i / capacity);
+    }
+    return rc;
+}

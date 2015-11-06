@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <io.h>
+#include "btree.h"
 
 bool miniSQL_createTable(table* tb)
 {
@@ -64,18 +65,83 @@ u32 miniSQL_delete(table* tb, Filter* f)
 
 bool miniSQL_createIndex(table* tb, const char* columnname, const char* indexname)
 {
+    size_t i;
+    for (i = 0; i < tb->colNum_u64; i++)
+    {
+        if (0==strcmp(tb->col[i].name_str,columnname))
+        {
+            strcpy(tb->col[i].idxname, indexname);
+            break;
+        }
+    }
+    if (i == tb->colNum_u64)
+    {
+        fprintf(stderr, "Column %s Not exists!", columnname);
+        return false;
+    }
+    btree_create(indexname, &tb->col[i]);
+    Recordmanager_addindex(tb, indexname, i);
     return true;
 }
 
-bool miniSQL_dropIndex(const char* idxname)
+bool miniSQL_dropIndex(table* tb,const char* idxname)
 {
+    char filename[259];
+    strcpy(filename, idxname);
+    strcat(filename, ".idx");
+    for (size_t i = 0; i < tb->colNum_u64; i++)
+    {
+        if (0 == strcmp(idxname, tb->col[i].idxname))
+        {
+            if (_access(filename, 0) == 0)// exist
+            {
+                remove(filename);
+                return true;
+            }
+            else
+            {
+                fprintf(stderr, "Missing Index File!\n");
+            }
+            
+        }
+    }
+
     return true;
 }
 
 void miniSQL_disconnectTable(table* tb)
 {
     catalog_disconnectTable(tb);
-    return;
+}
+
+void printRecord(record r)
+{
+    for (vector<item>::iterator it = r.i.begin(); it < r.i.end(); ++it)
+    {
+        item i = *it;
+        switch (i.type)
+        {
+        default:
+            break;
+        case INT:
+            fprintf(stdout, "INT: %d\n", i.data.i);
+            break;
+        case CHAR: 
+            fprintf(stdout, "CHAR: %s\n", i.data.str);
+            break;
+        case FLOAT: 
+            fprintf(stdout, "FLOAT: %f\n", i.data.f);
+            break;
+        }
+    }
+}
+
+void printVrecord(vector<record> r)
+{
+    for (vector<record>::iterator it = (r).begin(); it < (r).end(); ++it)
+    {
+        printRecord((*it));
+    }
 }
 
 u8 Rule_cmp(dataType type, Data* s, Data* dst, Rule* rule)

@@ -56,7 +56,6 @@ SELECT_S 	 : SELECT  STAR FROM NAME WHERE TJS  TM {
 				puts("selects");
 				if((tb = miniSQL_connectTable((char*)$4)) == NULL){
 					fprintf(stderr,"table not exist.");
-					return 0;
 				}
 				Rule rule;
 				for (vector<TData>::iterator i = Tdatas.begin();i!=Tdatas.end();++i){
@@ -82,10 +81,9 @@ SELECT_S 	 : SELECT  STAR FROM NAME WHERE TJS  TM {
 					}
 					filter.rules.push_back(rule);
 				}
-				miniSQL_select(tb,&filter);
-				filter.rules.empty();
-				Tdatas.empty();
-				return 1;
+				printVrecord(miniSQL_select(tb,&filter));
+				filter.rules.clear();
+				Tdatas.clear();
 }
 			 | SELECT  STAR FROM NAME TM
 			 {
@@ -95,10 +93,9 @@ SELECT_S 	 : SELECT  STAR FROM NAME WHERE TJS  TM {
 					fprintf(stderr,"table not exist.");
 					return 0;
 				}
-				filter.rules.empty();
-				miniSQL_select(tb,&filter);
-				Tdatas.empty();
-				return 1;
+				filter.rules.clear();
+				printVrecord(miniSQL_select(tb,&filter));
+				Tdatas.clear();
 			 }
 			 ;
 
@@ -150,7 +147,13 @@ CREATE_S 	 : CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM {
 				tb.colNum_u64=0;
 				tb.recordSize = 0;
 				}
-			 | CREATE INDEX NAME ON NAME CC NAME CC TM;
+			 | CREATE INDEX NAME ON NAME CC NAME CC TM
+			 {
+			 	table * tp = miniSQL_connectTable((const char*)$5);
+				if(tp == NULL) {fprintf(stderr,"Table Not Exist!\n"); return 0;}
+				puts((char*)$3);
+				miniSQL_createIndex(tp,(char*)$7,(char*)$3);
+			 };
 
 ATTRS		 : ATTR 	{}
 			 | ATTRS  DD ATTR {}
@@ -234,7 +237,7 @@ INSERT_S     : INSERT INTO NAME VALUES CC VALUESS CC TM{
 				}
 				miniSQL_insert(tp, &rcd);
 				miniSQL_disconnectTable(tp);
-				rcd.i.empty();
+				rcd.i.clear();
 }
 			  ;
 
@@ -302,14 +305,35 @@ DELETE_S	 : DELETE FROM NAME WHERE TJS TM{
 					filter.rules.push_back(rule);
 				}
 				miniSQL_delete(tb,&filter);
-				filter.rules.empty();
-				Tdatas.empty();
+				filter.rules.clear();
+				Tdatas.clear();
 				return 1;
 				
 }
-			 | DELETE FROM NAME TM
+			 | DELETE FROM NAME TM{
+			 	table *tb;
+				puts("deletes");
+				if((tb = miniSQL_connectTable((char*)$4)) == NULL){
+					fprintf(stderr,"table not exist.");
+					return 0;
+				}
+				filter.rules.clear();
+				miniSQL_delete(tb,&filter);
+				Tdatas.clear();
+			 }
 
-DROP_S   	 : DROP TABLE NAME TM{}
-			 | DROP INDEX NAME TM
+
+DROP_S   	 : DROP TABLE NAME TM{
+				table *tb;
+				puts("drop table");
+				if((tb = miniSQL_connectTable((char*)$4)) == NULL){
+					fprintf(stderr,"table not exist.");
+					return 0;
+				}
+				miniSQL_dropTable(tb);
+}
+			 | DROP INDEX NAME TM{
+			 
+			 }
 			 ;			 
 %%

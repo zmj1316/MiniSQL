@@ -38,5 +38,9 @@ vector<record> Recordmanager_selectRecord(
 //    const char *idxname,
 //    Rule *rule
 //    );
-
+bool Recordmanager_addindex(
+    table* tb,
+    const char * idxname,
+    u32 colidx
+    );
 #endif

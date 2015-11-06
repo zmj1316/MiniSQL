@@ -8,7 +8,7 @@
 #ifndef _GLOBAL_H
 #define _GLOBAL_H
 #include <iostream>
-using namespace std;
+//using namespace std;
 #define BLOCKSIZE 4096
 #define MAXCOLUMN 128
 

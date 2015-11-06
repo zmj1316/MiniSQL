@@ -22,6 +22,7 @@
 #define NONEXT 0xFFFFFFFF
 #define EMPTYBLOCK 0x0
 #include <set>
+using namespace std;
 /* Public Functions */
 bool btree_create(
     const char *,   // index name

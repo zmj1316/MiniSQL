@@ -100,9 +100,14 @@ int main()
     r.i.push_back(i);
     miniSQL_insert(tt, &r);
     r.i[0].data.str = "12345679";
+    r.i[1].data.str = "wy2";
+    miniSQL_insert(tt, &r);
+    r.i[0].data.str = "00000000";
+    r.i[1].data.str = "wy300";
     miniSQL_insert(tt, &r);
     miniSQL_disconnectTable(tt);
     tt = miniSQL_connectTable("student");
+    miniSQL_createIndex(tt, "sno", "stunameidx");
     miniSQL_select(tt, new Filter);
     return 0;
 }

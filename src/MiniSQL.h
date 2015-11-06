@@ -29,10 +29,10 @@ typedef union Data Data;
 class column
 {
 public:
-    char name_str[255];// column name
-    char idxname[255]; // index name empty for No index
+    char name_str[256];// column name
+    char idxname[256]; // index name empty for No index
     dataType type;// data type
-    bool unique_u8;// unique?
+    u8 unique_u8;// unique?
     u8 size_u8;// size: int&float->4 str->0~255
 };
 
@@ -125,13 +125,15 @@ bool miniSQL_createIndex(
     const char * indexname
     );
 bool miniSQL_dropIndex(
-    //table *,
+    table *,
     //u32 index
     const char *
     );
 void miniSQL_disconnectTable(
     table *
     );
+void printRecord(record r);
+void printVrecord(vector<record> r);
 /***************/
 
 u8 Rule_cmp(dataType type, Data* s, Data *dst, Rule *);

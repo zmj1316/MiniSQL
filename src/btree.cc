@@ -6,6 +6,8 @@
 #include <string>
 #include <stdlib.h>
 #include <io.h>
+#include <vector>
+using namespace std;
 /* create index of {col} in {tb} named {idxname} */
 bool btree_create(const char * idxname, column *col)
 {
@@ -57,6 +59,7 @@ bool btree_insert(const char *idxname, Data *target,u32 value)
     /* get index info */
     if (!getBtree(&bt, idxname)) return false;
     node nd;
+    memset(&nd, 0, sizeof(node));
     /* find node to insert */
     findNode(&bt, &nd, target);
     /* find locate inside node*/
@@ -849,7 +852,6 @@ void deleteNonleaf(btree* bt,Data* data, u32 parent)
             {
                 u32 size = (nd.N + next.N);
                 next.N = size - (size / 2);
-                node child;
                 /* move data */
                 u32 end = size / 2 - nd.N;
                 for (size_t i = 0; i < end; i++)
