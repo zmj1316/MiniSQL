@@ -20,6 +20,14 @@ extern int32_t yylineno;
 int32_t yylex();
 table tb;
 record rcd;
+Filter filter;
+typedef struct{
+	char * name;
+	Compare cmp;
+	item i;
+} TData;
+vector<TData> Tdatas;
+Compare cmp;
 %}
 %token STRING 
 %token CREATE DROP SELECT INSERT DELETE QUIT EXEC
@@ -43,17 +51,85 @@ statement 	:  SELECT_S		{printf("select\n");}
 			|  QUIT			{exit(0);}
 			;
 
-SELECT_S 	 : SELECT  STAR FROM NAME WHERE TJ  TM {}
+SELECT_S 	 : SELECT  STAR FROM NAME WHERE TJS  TM {
+				table *tb;
+				puts("selects");
+				if((tb = miniSQL_connectTable((char*)$4)) == NULL){
+					fprintf(stderr,"table not exist.");
+					return 0;
+				}
+				Rule rule;
+				for (vector<TData>::iterator i = Tdatas.begin();i!=Tdatas.end();++i){
+					for(int i0 = 0; i0 < tb->colNum_u64;++i0){
+						if(0==strcmp((*i).name,tb->col[i0].name_str)){
+							if((*i).i.type==tb->col[i0].type){
+								rule.colNo = i0;
+								rule.cmp = (*i).cmp;
+								rule.target = (*i).i.data;
+								break;
+							}
+							else if((*i).i.type == INT && tb->col[i0].type == FLOAT){
+								rule.colNo = i0;
+								rule.cmp = (*i).cmp;
+								rule.target.f = (float)(*i).i.data.i;
+								break;
+							}
+							else{
+								fprintf(stderr,"type of %s not match!",(*i).name);
+								return 0;
+							}
+						}
+					}
+					filter.rules.push_back(rule);
+				}
+				miniSQL_select(tb,&filter);
+				filter.rules.empty();
+				Tdatas.empty();
+				return 1;
+}
 			 | SELECT  STAR FROM NAME TM
+			 {
+			 	table *tb;
+				puts("selects");
+				if((tb = miniSQL_connectTable((char*)$4)) == NULL){
+					fprintf(stderr,"table not exist.");
+					return 0;
+				}
+				filter.rules.empty();
+				miniSQL_select(tb,&filter);
+				Tdatas.empty();
+				return 1;
+			 }
 			 ;
 
-TJ			: NAME FL TAR
-			| TJ AND NAME FL TAR
+TJS			: TJ
+			| TJS AND TJ
 			;
 
-TAR			: INTEGER {puts("TAR");}
-			| FF	{puts("TAR");}
-			| STRING	{puts((char*)$1);}
+TJ			: NAME FL INTEGER {
+				TData t;
+				t.name = (char*) $1;
+				t.cmp = cmp;
+				t.i.data.i = *(int*)$3;
+				t.i.type = INT;
+				Tdatas.push_back(t);
+}
+			| NAME FL FF	{
+				TData t;
+				t.name = (char*) $1;
+				t.cmp = **(u8 **)(void **)$2;
+				t.i.data.f = *(float*)$3;
+				t.i.type = FLOAT;
+				Tdatas.push_back(t);
+				}
+			| NAME FL STRING	{
+				TData t;
+				t.name = (char*) $1;
+				t.cmp = **(u8 **)(void **)$2;
+				t.i.data.str = (char*)$3;
+				t.i.type = CHAR;
+				Tdatas.push_back(t);
+				}
 			;
 
 
@@ -130,6 +206,18 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 INSERT_S     : INSERT INTO NAME VALUES CC VALUESS CC TM{
 				table * tp = miniSQL_connectTable((const char*)$3);
 				if(tp == NULL) {fprintf(stderr,"Table Not Exist!\n"); return 0;}
+				for(int i = 0 ; i < tp->colNum_u64; i++){
+					if(tp->col[i].type!=rcd.i[i].type){
+						if(rcd.i[i].type == INT && tp->col[i].type == FLOAT){
+							rcd.i[i].type = FLOAT;
+							rcd.i[i].data.f = (float)rcd.i[i].data.i;
+						}
+						else{
+							fprintf(stderr,"Value not match type!");
+							return 0;
+						}
+					}
+				}
 				miniSQL_insert(tp, &rcd);
 				miniSQL_disconnectTable(tp);
 }
@@ -159,15 +247,15 @@ VALUESS      : VALUE
 			 | VALUESS DD VALUE
 			 ;
 
-FL 			 : mLE	{puts("FL");}
-			 | mLT	{puts("FL");}
-			 | mEQ	{puts("FL");}
-			 | mNE	{puts("FL");}
-			 | mGE	{puts("FL");}
-			 | mGT	{puts("FL");}
+FL 			 : mLE	{cmp = LE;}
+			 | mLT	{cmp = LT;}
+			 | mEQ	{cmp = EQ;}
+			 | mNE	{cmp = NE;}
+			 | mGE	{cmp = GE;}
+			 | mGT	{cmp = GT;}
 			 ;
 
-DELETE_S	 : DELETE FROM NAME WHERE NAME FL TAR TM
+DELETE_S	 : DELETE FROM NAME WHERE TJS TM
 			 | DELETE FROM NAME TM
 
 DROP_S   	 : DROP TABLE NAME TM{}

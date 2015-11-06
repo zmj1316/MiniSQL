@@ -49,53 +49,17 @@ bool miniSQL_dropTable(table* tb)
 
 vector<record> miniSQL_select(table* tb, Filter* filter)
 {
-    for (vector<Rule>::iterator i = filter->rules.begin(); i != filter->rules.end(); ++i)
-    {
-        if (tb->col[i->colNo].idxname[0]!='0')  // have index 
-        {
-            return Recordmanager_selectRecordwithIndex(tb, filter, tb->col[i->colNo].idxname,&(*i));
-        }
-    }
     return Recordmanager_selectRecord(tb, filter);
 }
 
 bool miniSQL_insert(table* tb, record* re)
 {
-    vector<u32> colNums;
-    vector<const char*> idxnames;
-    for (size_t i = 0; i < tb->colNum_u64; i++)
-    {
-        if (tb->col[i].idxname[0]!=0)
-        {
-            colNums.push_back(i);
-            idxnames.push_back(tb->col[i].idxname);
-        }
-    }
-    if (colNums.size() == 0)
-    {
-        return Recordmanager_insertRecord(tb, re);
-    }
-    Recordmanager_insertRecordwithIndex(tb, re, idxnames, colNums);
-    return true;
+    return Recordmanager_insertRecord(tb, re);
 }
 
 u32 miniSQL_delete(table* tb, Filter* f)
 {
-    vector<u32> colNums;
-    vector<const char*> idxnames;
-    for (size_t i = 0; i < tb->colNum_u64; i++)
-    {
-        if (tb->col[i].idxname[0] != 0)
-        {
-            colNums.push_back(i);
-            idxnames.push_back(tb->col[i].idxname);
-        }
-    }
-    if (colNums.size() == 0)
-    {
-        return Recordmanager_deleteRecord(tb, f);
-    }
-    return Recordmanager_deleteRecordwithIndex(tb, f, idxnames, colNums);
+    return Recordmanager_deleteRecord(tb, f);
 }
 
 bool miniSQL_createIndex(table* tb, const char* columnname, const char* indexname)

@@ -32,10 +32,10 @@ bool btree_insert(
     Data* i,         // Data to insert
     u32 value       // value(blocknum)
     );
-u32 btree_delete(
-    const char *,
-    Rule *
-    );
+//u32 btree_delete(
+//    const char *,
+//    Rule *
+//    );
 u32 btree_delete_node(
     const char *,
     Data *

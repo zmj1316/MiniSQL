@@ -91,10 +91,19 @@ extern int32_t yylineno;
 int32_t yylex();
 table tb;
 record rcd;
+Filter filter;
+typedef struct{
+	char * name;
+	Compare cmp;
+	item i;
+} TData;
+vector<TData> Tdatas;
+Compare cmp;
+
 
 
 /* Line 189 of yacc.c  */
-#line 98 "ra.tab.c"
+#line 107 "ra.tab.c"
 
 /* Enabling traces.  */
 #ifndef YYDEBUG
@@ -176,7 +185,7 @@ typedef int YYSTYPE;
 
 
 /* Line 264 of yacc.c  */
-#line 180 "ra.tab.c"
+#line 189 "ra.tab.c"
 
 #ifdef short
 # undef short
@@ -391,7 +400,7 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  22
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   89
+#define YYLAST   84
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  41
@@ -400,7 +409,7 @@ union yyalloc
 /* YYNRULES -- Number of rules.  */
 #define YYNRULES  43
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  99
+#define YYNSTATES  95
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
@@ -450,10 +459,10 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     5,     7,    10,    12,    14,    16,    18,
-      20,    22,    30,    36,    40,    46,    48,    50,    52,    66,
-      76,    78,    82,    88,    95,    98,   102,   105,   109,   118,
-     120,   122,   124,   126,   130,   132,   134,   136,   138,   140,
-     142,   151,   156,   161
+      20,    22,    30,    36,    38,    42,    46,    50,    54,    68,
+      78,    80,    84,    90,    97,   100,   104,   107,   111,   120,
+     122,   124,   126,   128,   132,   134,   136,   138,   140,   142,
+     144,   151,   156,   161
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
@@ -462,30 +471,30 @@ static const yytype_int8 yyrhs[] =
       42,     0,    -1,    43,    -1,    44,    -1,    43,    44,    -1,
       45,    -1,    48,    -1,    56,    -1,    55,    -1,    51,    -1,
        9,    -1,     6,    20,    12,    24,    30,    46,    29,    -1,
-       6,    20,    12,    24,    29,    -1,    24,    54,    47,    -1,
-      46,    40,    24,    54,    47,    -1,    25,    -1,    26,    -1,
-       3,    -1,     4,    11,    24,    34,    49,    31,    36,    37,
-      34,    24,    34,    34,    29,    -1,     4,    38,    24,    39,
-      24,    34,    24,    34,    29,    -1,    50,    -1,    49,    31,
-      50,    -1,    24,    21,    34,    25,    34,    -1,    24,    21,
-      34,    25,    34,    35,    -1,    24,    23,    -1,    24,    23,
-      35,    -1,    24,    22,    -1,    24,    22,    35,    -1,     7,
-      13,    24,    33,    34,    53,    34,    29,    -1,     3,    -1,
-      25,    -1,    26,    -1,    52,    -1,    53,    31,    52,    -1,
-      15,    -1,    14,    -1,    16,    -1,    19,    -1,    18,    -1,
-      17,    -1,     8,    12,    24,    30,    24,    54,    47,    29,
+       6,    20,    12,    24,    29,    -1,    47,    -1,    46,    40,
+      47,    -1,    24,    54,    25,    -1,    24,    54,    26,    -1,
+      24,    54,     3,    -1,     4,    11,    24,    34,    49,    31,
+      36,    37,    34,    24,    34,    34,    29,    -1,     4,    38,
+      24,    39,    24,    34,    24,    34,    29,    -1,    50,    -1,
+      49,    31,    50,    -1,    24,    21,    34,    25,    34,    -1,
+      24,    21,    34,    25,    34,    35,    -1,    24,    23,    -1,
+      24,    23,    35,    -1,    24,    22,    -1,    24,    22,    35,
+      -1,     7,    13,    24,    33,    34,    53,    34,    29,    -1,
+       3,    -1,    25,    -1,    26,    -1,    52,    -1,    53,    31,
+      52,    -1,    15,    -1,    14,    -1,    16,    -1,    19,    -1,
+      18,    -1,    17,    -1,     8,    12,    24,    30,    46,    29,
       -1,     8,    12,    24,    29,    -1,     5,    11,    24,    29,
       -1,     5,    38,    24,    29,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,    31,    31,    34,    35,    38,    39,    40,    41,    42,
-      43,    46,    47,    50,    51,    54,    55,    56,    61,    75,
-      77,    78,    81,    89,    97,   105,   113,   121,   131,   139,
-     145,   151,   159,   160,   163,   164,   165,   166,   167,   168,
-     171,   172,   174,   175
+       0,    40,    40,    43,    44,    47,    48,    49,    50,    51,
+      52,    55,    91,   106,   107,   110,   118,   126,   138,   151,
+     153,   154,   157,   165,   173,   181,   189,   197,   207,   227,
+     233,   239,   247,   248,   251,   252,   253,   254,   255,   256,
+     259,   260,   262,   263
 };
 #endif
 
@@ -499,7 +508,7 @@ static const char *const yytname[] =
   "mLE", "mEQ", "mGT", "mGE", "mNE", "STAR", "tCHAR", "tFLOAT", "tINT",
   "NAME", "INTEGER", "FF", "LS", "RS", "TM", "WHERE", "DD", "NEWLINE",
   "VALUES", "CC", "UNI", "PRIM", "KEY", "INDEX", "ON", "AND", "$accept",
-  "program", "statements", "statement", "SELECT_S", "TJ", "TAR",
+  "program", "statements", "statement", "SELECT_S", "TJS", "TJ",
   "CREATE_S", "ATTRS", "ATTR", "INSERT_S", "VALUE", "VALUESS", "FL",
   "DELETE_S", "DROP_S", 0
 };
@@ -532,10 +541,10 @@ static const yytype_uint8 yyr1[] =
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     1,     1,     2,     1,     1,     1,     1,     1,
-       1,     7,     5,     3,     5,     1,     1,     1,    13,     9,
+       1,     7,     5,     1,     3,     3,     3,     3,    13,     9,
        1,     3,     5,     6,     2,     3,     2,     3,     8,     1,
        1,     1,     1,     3,     1,     1,     1,     1,     1,     1,
-       8,     4,     4,     4
+       6,     4,     4,     4
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -547,43 +556,43 @@ static const yytype_uint8 yydefact[] =
        5,     6,     9,     8,     7,     0,     0,     0,     0,     0,
        0,     0,     1,     4,     0,     0,     0,     0,     0,     0,
        0,     0,     0,    42,    43,     0,     0,    41,     0,     0,
-       0,    20,     0,    12,     0,     0,     0,     0,    26,    24,
-       0,     0,     0,     0,    29,    30,    31,    32,     0,    35,
-      34,    36,    39,    38,    37,     0,     0,    27,    25,     0,
-      21,     0,     0,    11,     0,     0,     0,    17,    15,    16,
-       0,     0,     0,     0,    13,     0,    33,    28,    40,    22,
-       0,    19,     0,    23,     0,    14,     0,     0,    18
+       0,    20,     0,    12,     0,     0,     0,     0,    13,     0,
+      26,    24,     0,     0,     0,    29,    30,    31,    32,     0,
+      35,    34,    36,    39,    38,    37,     0,    40,     0,     0,
+      27,    25,     0,    21,     0,    11,     0,     0,    17,    15,
+      16,    14,     0,     0,     0,    33,    28,    22,     0,    19,
+      23,     0,     0,     0,    18
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     7,     8,     9,    10,    53,    80,    11,    40,    41,
-      12,    57,    58,    65,    13,    14
+      -1,     7,     8,     9,    10,    47,    48,    11,    40,    41,
+      12,    58,    59,    66,    13,    14
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -69
+#define YYPACT_NINF -25
 static const yytype_int8 yypact[] =
 {
-       6,   -10,    -9,    -4,    14,    30,   -69,    32,     6,   -69,
-     -69,   -69,   -69,   -69,   -69,    19,    21,    22,    23,    36,
-      25,    26,   -69,   -69,    10,    12,    24,    27,    28,    29,
-      -7,    31,    33,   -69,   -69,    11,    34,   -69,    35,    -2,
-      38,   -69,    37,   -69,    39,     0,    20,    40,    41,    42,
-     -19,    43,    20,   -22,   -69,   -69,   -69,   -69,   -25,   -69,
-     -69,   -69,   -69,   -69,   -69,     5,    45,   -69,   -69,    17,
-     -69,    44,     5,   -69,    48,     0,    46,   -69,   -69,   -69,
-      50,    47,    49,    51,   -69,    20,   -69,   -69,   -69,    52,
-      58,   -69,     5,   -69,    54,   -69,    55,    56,   -69
+       5,   -11,   -10,   -16,    -5,     7,   -25,    20,     5,   -25,
+     -25,   -25,   -25,   -25,   -25,     2,    18,    19,    21,    32,
+      22,    23,   -25,   -25,    14,    10,    24,    25,    26,    27,
+      -7,    28,    31,   -25,   -25,    11,    29,   -25,    33,    16,
+      30,   -25,    34,   -25,    33,    -1,    17,   -24,   -25,    35,
+      36,    37,   -21,    38,   -23,   -25,   -25,   -25,   -25,   -13,
+     -25,   -25,   -25,   -25,   -25,   -25,     4,   -25,    33,    39,
+     -25,   -25,    40,   -25,    41,   -25,    -1,    44,   -25,   -25,
+     -25,   -25,    42,    45,    49,   -25,   -25,    46,    43,   -25,
+     -25,    48,    50,    51,   -25
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -69,   -69,   -69,    53,   -69,   -69,   -68,   -69,   -69,     8,
-     -69,   -15,   -69,   -52,   -69,   -69
+     -25,   -25,   -25,    57,   -25,    12,   -17,   -25,   -25,     6,
+     -25,    -6,   -25,   -25,   -25,   -25
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -593,28 +602,28 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      72,    15,    17,    54,    84,    39,    75,    73,    77,    76,
-       1,     2,     3,     4,     5,     6,    19,    69,    74,    47,
-      48,    49,    37,    38,    95,    55,    56,    20,    16,    18,
-      78,    79,    22,    92,    59,    60,    61,    62,    63,    64,
-      43,    44,    21,    24,    31,    25,    26,    27,    28,    29,
-      30,    32,    35,    33,    82,    39,    34,    42,    70,    46,
-      86,    23,    36,    52,     0,     0,     0,    71,    45,    50,
-      81,    51,    85,     0,    66,    87,    67,    68,    83,    88,
-      91,    89,    94,    90,     0,    98,     0,    93,    96,    97
+      15,    17,    55,    39,    19,    67,    75,    78,    20,     1,
+       2,     3,     4,     5,     6,    72,    68,    68,    76,    21,
+      22,    77,    37,    38,    56,    57,    24,    16,    18,    79,
+      80,    60,    61,    62,    63,    64,    65,    49,    50,    51,
+      43,    44,    25,    26,    28,    27,    29,    30,    31,    32,
+      35,    81,    39,    33,    34,    42,    54,    46,    73,     0,
+      36,    52,    74,    45,    82,    23,     0,    91,    53,    69,
+      85,    70,    71,    86,     0,    84,    87,    83,    89,    88,
+      94,    90,    92,     0,    93
 };
 
 static const yytype_int8 yycheck[] =
 {
-      52,    11,    11,     3,    72,    24,    31,    29,     3,    34,
-       4,     5,     6,     7,     8,     9,    20,    36,    40,    21,
-      22,    23,    29,    30,    92,    25,    26,    13,    38,    38,
-      25,    26,     0,    85,    14,    15,    16,    17,    18,    19,
-      29,    30,    12,    24,    34,    24,    24,    24,    12,    24,
-      24,    39,    24,    29,    37,    24,    29,    24,    50,    24,
-      75,     8,    33,    24,    -1,    -1,    -1,    24,    34,    31,
-      25,    34,    24,    -1,    34,    29,    35,    35,    34,    29,
-      29,    34,    24,    34,    -1,    29,    -1,    35,    34,    34
+      11,    11,     3,    24,    20,    29,    29,     3,    13,     4,
+       5,     6,     7,     8,     9,    36,    40,    40,    31,    12,
+       0,    34,    29,    30,    25,    26,    24,    38,    38,    25,
+      26,    14,    15,    16,    17,    18,    19,    21,    22,    23,
+      29,    30,    24,    24,    12,    24,    24,    24,    34,    39,
+      24,    68,    24,    29,    29,    24,    44,    24,    52,    -1,
+      33,    31,    24,    34,    25,     8,    -1,    24,    34,    34,
+      76,    35,    35,    29,    -1,    34,    34,    37,    29,    34,
+      29,    35,    34,    -1,    34
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -625,12 +634,12 @@ static const yytype_uint8 yystos[] =
       45,    48,    51,    55,    56,    11,    38,    11,    38,    20,
       13,    12,     0,    44,    24,    24,    24,    24,    12,    24,
       24,    34,    39,    29,    29,    24,    33,    29,    30,    24,
-      49,    50,    24,    29,    30,    34,    24,    21,    22,    23,
-      31,    34,    24,    46,     3,    25,    26,    52,    53,    14,
-      15,    16,    17,    18,    19,    54,    34,    35,    35,    36,
-      50,    24,    54,    29,    40,    31,    34,     3,    25,    26,
-      47,    25,    37,    34,    47,    24,    52,    29,    29,    34,
-      34,    29,    54,    35,    24,    47,    34,    34,    29
+      49,    50,    24,    29,    30,    34,    24,    46,    47,    21,
+      22,    23,    31,    34,    46,     3,    25,    26,    52,    53,
+      14,    15,    16,    17,    18,    19,    54,    29,    40,    34,
+      35,    35,    36,    50,    24,    29,    31,    34,     3,    25,
+      26,    47,    25,    37,    34,    52,    29,    34,    34,    29,
+      35,    24,    34,    34,    29
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1444,81 +1453,154 @@ yyreduce:
         case 5:
 
 /* Line 1455 of yacc.c  */
-#line 38 "yacc.y"
+#line 47 "yacc.y"
     {printf("select\n");;}
     break;
 
   case 6:
 
 /* Line 1455 of yacc.c  */
-#line 39 "yacc.y"
+#line 48 "yacc.y"
     {printf("create\n");;}
     break;
 
   case 7:
 
 /* Line 1455 of yacc.c  */
-#line 40 "yacc.y"
+#line 49 "yacc.y"
     {printf("drop\n");;}
     break;
 
   case 8:
 
 /* Line 1455 of yacc.c  */
-#line 41 "yacc.y"
+#line 50 "yacc.y"
     {printf("delete\n");;}
     break;
 
   case 9:
 
 /* Line 1455 of yacc.c  */
-#line 42 "yacc.y"
+#line 51 "yacc.y"
     {printf("insert\n");;}
     break;
 
   case 10:
 
 /* Line 1455 of yacc.c  */
-#line 43 "yacc.y"
+#line 52 "yacc.y"
     {exit(0);;}
     break;
 
   case 11:
 
 /* Line 1455 of yacc.c  */
-#line 46 "yacc.y"
-    {;}
+#line 55 "yacc.y"
+    {
+				table *tb;
+				puts("selects");
+				if((tb = miniSQL_connectTable((char*)(yyvsp[(4) - (7)]))) == NULL){
+					fprintf(stderr,"table not exist.");
+					return 0;
+				}
+				Rule rule;
+				for (vector<TData>::iterator i = Tdatas.begin();i!=Tdatas.end();++i){
+					for(int i0 = 0; i0 < tb->colNum_u64;++i0){
+						if(0==strcmp((*i).name,tb->col[i0].name_str)){
+							if((*i).i.type==tb->col[i0].type){
+								rule.colNo = i0;
+								rule.cmp = (*i).cmp;
+								rule.target = (*i).i.data;
+								break;
+							}
+							else if((*i).i.type == INT && tb->col[i0].type == FLOAT){
+								rule.colNo = i0;
+								rule.cmp = (*i).cmp;
+								rule.target.f = (float)(*i).i.data.i;
+								break;
+							}
+							else{
+								fprintf(stderr,"type of %s not match!",(*i).name);
+								return 0;
+							}
+						}
+					}
+					filter.rules.push_back(rule);
+				}
+				miniSQL_select(tb,&filter);
+				filter.rules.empty();
+				Tdatas.empty();
+				return 1;
+;}
+    break;
+
+  case 12:
+
+/* Line 1455 of yacc.c  */
+#line 92 "yacc.y"
+    {
+			 	table *tb;
+				puts("selects");
+				if((tb = miniSQL_connectTable((char*)(yyvsp[(4) - (5)]))) == NULL){
+					fprintf(stderr,"table not exist.");
+					return 0;
+				}
+				filter.rules.empty();
+				miniSQL_select(tb,&filter);
+				Tdatas.empty();
+				return 1;
+			 ;}
     break;
 
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 54 "yacc.y"
-    {puts("TAR");;}
+#line 110 "yacc.y"
+    {
+				TData t;
+				t.name = (char*) (yyvsp[(1) - (3)]);
+				t.cmp = cmp;
+				t.i.data.i = *(int*)(yyvsp[(3) - (3)]);
+				t.i.type = INT;
+				Tdatas.push_back(t);
+;}
     break;
 
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 55 "yacc.y"
-    {puts("TAR");;}
+#line 118 "yacc.y"
+    {
+				TData t;
+				t.name = (char*) (yyvsp[(1) - (3)]);
+				t.cmp = **(u8 **)(void **)(yyvsp[(2) - (3)]);
+				t.i.data.f = *(float*)(yyvsp[(3) - (3)]);
+				t.i.type = FLOAT;
+				Tdatas.push_back(t);
+				;}
     break;
 
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 56 "yacc.y"
-    {puts((char*)(yyvsp[(1) - (1)]));;}
+#line 126 "yacc.y"
+    {
+				TData t;
+				t.name = (char*) (yyvsp[(1) - (3)]);
+				t.cmp = **(u8 **)(void **)(yyvsp[(2) - (3)]);
+				t.i.data.str = (char*)(yyvsp[(3) - (3)]);
+				t.i.type = CHAR;
+				Tdatas.push_back(t);
+				;}
     break;
 
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 61 "yacc.y"
+#line 138 "yacc.y"
     {
 				strcpy(tb.name_str,(char*)(yyvsp[(3) - (13)]));
 				for(int i = 0; i < tb.colNum_u64;i++){
-					puts(tb.col[i].name_str);
 					if (strcmp((char*)(yyvsp[(10) - (13)]),tb.col[i].name_str) == 0)
 					{
 						tb.primarykey_u8 = i;
@@ -1534,21 +1616,21 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 77 "yacc.y"
+#line 153 "yacc.y"
     {;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 78 "yacc.y"
+#line 154 "yacc.y"
     {;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 81 "yacc.y"
+#line 157 "yacc.y"
     {
 				int i = tb.colNum_u64++;
 				column *col = &tb.col[i];
@@ -1562,7 +1644,7 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 89 "yacc.y"
+#line 165 "yacc.y"
     {
 			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
@@ -1576,7 +1658,7 @@ yyreduce:
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 97 "yacc.y"
+#line 173 "yacc.y"
     {
 			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
@@ -1590,7 +1672,7 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 105 "yacc.y"
+#line 181 "yacc.y"
     {
 			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
@@ -1604,7 +1686,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 113 "yacc.y"
+#line 189 "yacc.y"
     {
 			 	int i = ++tb.colNum_u64;
 			 	column *col = &tb.col[i];
@@ -1618,7 +1700,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 121 "yacc.y"
+#line 197 "yacc.y"
     {
 			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
@@ -1632,10 +1714,22 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 131 "yacc.y"
+#line 207 "yacc.y"
     {
 				table * tp = miniSQL_connectTable((const char*)(yyvsp[(3) - (8)]));
 				if(tp == NULL) {fprintf(stderr,"Table Not Exist!\n"); return 0;}
+				for(int i = 0 ; i < tp->colNum_u64; i++){
+					if(tp->col[i].type!=rcd.i[i].type){
+						if(rcd.i[i].type == INT && tp->col[i].type == FLOAT){
+							rcd.i[i].type = FLOAT;
+							rcd.i[i].data.f = (float)rcd.i[i].data.i;
+						}
+						else{
+							fprintf(stderr,"Value not match type!");
+							return 0;
+						}
+					}
+				}
 				miniSQL_insert(tp, &rcd);
 				miniSQL_disconnectTable(tp);
 ;}
@@ -1644,7 +1738,7 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 139 "yacc.y"
+#line 227 "yacc.y"
     {
 					item i;
 					i.type = CHAR;
@@ -1656,7 +1750,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 145 "yacc.y"
+#line 233 "yacc.y"
     {
 			 		item i;
 			 		i.type = INT;
@@ -1668,7 +1762,7 @@ yyreduce:
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 151 "yacc.y"
+#line 239 "yacc.y"
     {
 			 		item i;
 			 		i.type = FLOAT;
@@ -1680,56 +1774,56 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 163 "yacc.y"
-    {puts("FL");;}
+#line 251 "yacc.y"
+    {cmp = LE;;}
     break;
 
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 164 "yacc.y"
-    {puts("FL");;}
+#line 252 "yacc.y"
+    {cmp = LT;;}
     break;
 
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 165 "yacc.y"
-    {puts("FL");;}
+#line 253 "yacc.y"
+    {cmp = EQ;;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 166 "yacc.y"
-    {puts("FL");;}
+#line 254 "yacc.y"
+    {cmp = NE;;}
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 167 "yacc.y"
-    {puts("FL");;}
+#line 255 "yacc.y"
+    {cmp = GE;;}
     break;
 
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 168 "yacc.y"
-    {puts("FL");;}
+#line 256 "yacc.y"
+    {cmp = GT;;}
     break;
 
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 174 "yacc.y"
+#line 262 "yacc.y"
     {;}
     break;
 
 
 
 /* Line 1455 of yacc.c  */
-#line 1733 "ra.tab.c"
+#line 1827 "ra.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1941,6 +2035,6 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 177 "yacc.y"
+#line 265 "yacc.y"
 
 

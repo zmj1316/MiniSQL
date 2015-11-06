@@ -62,11 +62,19 @@ public:
     bool valid;// valid flag (??)
 };
 
-enum Compare
-{
-    LT, LE, EQ, NE,GE, GT // Compare type
-};
-typedef enum Compare Compare;
+//enum Compare
+//{
+//    LT, LE, EQ, NE,GE, GT // Compare type
+//};
+//typedef enum Compare Compare;
+typedef u8 Compare;
+const u8 LT = 0;
+const u8 LE = 1;
+const u8 EQ = 2;
+const u8 NE = 3;
+const u8 GE = 4;
+const u8 GT = 5;
+
 class Rule
 {
 public:

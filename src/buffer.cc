@@ -85,6 +85,9 @@ void newBlock(Buffer* buf)
 {
     FILE *fp;
     fp = fopen(buf->filename, "ab");
-    fseek(fp, BLOCKSIZE, SEEK_END);
+    fseek(fp, 0, SEEK_END);
+    u8* tmp = (u8*)malloc(BLOCKSIZE);
+    memset(tmp, 0, BLOCKSIZE);
+    fwrite(tmp, BLOCKSIZE, 1, fp);
     fclose(fp);
 }
