@@ -70,6 +70,7 @@ static record binary2record(table* tab, u8* bin)
     {
         
         column *col = &(tab->col[i]);
+        it.type = col->type;
         switch (col->type)
         {
         case INT:
@@ -134,7 +135,7 @@ bool Recordmanager_insertRecord(table* tab, record* rcd)
                 r.colNo = k;
                 if (btree_select(tab->col[k].idxname, &r).size() != 0)
                 {
-                    fprintf(stderr, "Unique check failure at index %s\n.", tab->col[k].idxname);
+                    fprintf(stderr, "Unique check failure at index %s.\n", tab->col[k].idxname);
                     return false;
                 }
             }
@@ -168,7 +169,6 @@ bool Recordmanager_insertRecord(table* tab, record* rcd)
                     if (Rule_cmp(tab->col[*it].type, &r.i[*it].data, &rcd->i[*it].data, EQ) == 1)
                     {
                         fprintf(stderr, "Unique check failure at %s.\n",tab->col[*it].name_str);
-                        fprintf(stderr, "%s || %s \n", r.i[*it].data.str, rcd->i[*it].data.str);
                         return false;
                     }
                 }

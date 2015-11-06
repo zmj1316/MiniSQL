@@ -78,17 +78,17 @@ ws       [ \t]+
 "on"        {return ON;}
 {id} {
   yylval = _strdup(yytext);
-  puts((char*)yylval);
+  //puts((char*)yylval);
   return NAME;
 }
 
 [()] {return CC;}
 
-\'[a-zA-Z0-9_]*\' {
+\'[^\']*\' {
   char *tmp =  _strdup(yytext);
   tmp[strlen(tmp) - 1]=0;
   yylval = tmp+1;
-  puts((char*)yylval);
+  //puts((char*)yylval);
   return STRING;
 }
 

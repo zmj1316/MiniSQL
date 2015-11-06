@@ -1,4 +1,4 @@
-CC = g++ 
+CC = g++ -O0
 ss: lex.yy.o ra.tab.o test.cpp MiniSQL.o
 	g++  lex.yy.o ra.tab.o MiniSQL.o catalog.o btree.o buffer.o record.o test.cpp 
 

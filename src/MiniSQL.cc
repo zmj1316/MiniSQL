@@ -44,7 +44,16 @@ table* miniSQL_connectTable(const char* tablename)
 
 bool miniSQL_dropTable(table* tb)
 {
-    fprintf(stdout, "drop tb %s\n", tb->name_str);
+    fprintf(stdout, "droping table %s\n", tb->name_str);
+    char filename[259];
+    strcpy(filename, tb->name_str);
+    strcat(filename, ".db");
+    if (_access(filename, 0) != 0)
+    {
+        fprintf(stderr, "File %s not Exists!\n", filename);
+        return false;
+    }
+    remove(filename);
     return catalog_dropTable(tb);
 }
 
@@ -79,20 +88,26 @@ bool miniSQL_createIndex(table* tb, const char* columnname, const char* indexnam
         fprintf(stderr, "Column %s Not exists!", columnname);
         return false;
     }
-    btree_create(indexname, &tb->col[i]);
+    
+    btree_create(tb->name_str, indexname, &tb->col[i]);
     Recordmanager_addindex(tb, indexname, i);
     return true;
 }
 
-bool miniSQL_dropIndex(table* tb,const char* idxname)
+bool miniSQL_dropIndex(const char* idxname)
 {
+    char tablename[256];
     char filename[259];
     strcpy(filename, idxname);
     strcat(filename, ".idx");
+    strcpy(tablename,btree_getTable(idxname));
+    table *tb = miniSQL_connectTable(tablename);
     for (size_t i = 0; i < tb->colNum_u64; i++)
     {
         if (0 == strcmp(idxname, tb->col[i].idxname))
         {
+            tb->col[i].idxname[0] = 0;
+            miniSQL_disconnectTable(tb);
             if (_access(filename, 0) == 0)// exist
             {
                 remove(filename);
@@ -101,12 +116,14 @@ bool miniSQL_dropIndex(table* tb,const char* idxname)
             else
             {
                 fprintf(stderr, "Missing Index File!\n");
+                return false;
             }
             
         }
     }
-
-    return true;
+    fprintf(stderr, "Index %s not exist!\n",idxname);
+    miniSQL_disconnectTable(tb);
+    return false;
 }
 
 void miniSQL_disconnectTable(table* tb)

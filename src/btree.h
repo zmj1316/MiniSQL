@@ -9,7 +9,7 @@
 #define ROOTPTR         8 // 4byte: Root block
 #define HEADPTR         12// 4byte: head block
 #define DATATYPE        16// 1byte: datatype 0:int 2:float 1:char
-
+#define TABLENAME       17// 256byte: table name
 //offset in block
 #define ENTRYCOUNT      0 // 4byte: count the number of entries in one block 0xFFFFFFFF >> empty block
 #define PARENTBLOCK     4 // 4byte: the parent block number (0xFFFFFFFF for root)
@@ -22,9 +22,11 @@
 #define NONEXT 0xFFFFFFFF
 #define EMPTYBLOCK 0x0
 #include <set>
+#include <io.h>
 using namespace std;
 /* Public Functions */
 bool btree_create(
+    const char* tablename,
     const char *,   // index name
     column *col     // column to build index
     );
@@ -33,6 +35,9 @@ bool btree_insert(
     Data* i,         // Data to insert
     u32 value       // value(blocknum)
     );
+const char* btree_getTable(
+    const char* idxname
+);
 //u32 btree_delete(
 //    const char *,
 //    Rule *
@@ -47,8 +52,9 @@ set<u32> btree_select(
     );
 
 /* Private */
-struct node
+class node
 {
+public:
     u32 parent;   // 4 byte
     /* The first 2 block is to store block info */
     Data *datas;
@@ -56,8 +62,13 @@ struct node
     u32 N;
     u32 nodeNo;     // 4 byte
     u32 next;
+    node()
+    {
+        datas = NULL;
+        childs = NULL;
+    }
 };  
-typedef struct node node;
+//typedef struct node node;
 //static node *allocNode(u32 N);
 struct btree
 {

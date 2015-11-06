@@ -5,6 +5,8 @@
 #include "string.h"
 #include "stdlib.h"
 #include "MiniSQL.h"
+#include <io.h>
+
 class temp
 {
 public:
@@ -74,9 +76,10 @@ bool catalog_dropTable(         // delete the catalog file
     strcpy(filename,tb->name_str);
     strcat(filename,".cat");
     
-    if((fp = fopen(filename,"wb"))==NULL)
-    {        fprintf(stderr,"Can't open the file") ;
-             return 0;
+    if (_access(filename, 0) != 0)
+    {
+        fprintf(stderr, "File %s not Exists!\n", filename);
+        return false;
     }
     remove(filename);
     return 1;

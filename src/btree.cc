@@ -9,7 +9,7 @@
 #include <vector>
 using namespace std;
 /* create index of {col} in {tb} named {idxname} */
-bool btree_create(const char * idxname, column *col)
+bool btree_create(const char* tablename,const char * idxname, column *col)
 {
     if (col == NULL)
     {
@@ -38,6 +38,7 @@ bool btree_create(const char * idxname, column *col)
     *(u32*)(buf.win + BLOCKCOUNT) = 0;
     *(u32*)(buf.win + ROOTPTR) = 1;
     *(u32*)(buf.win + HEADPTR) = 1;
+    strcpy((char*)buf.win + TABLENAME, tablename);
     buf.dirty = true;
     sync_window(&buf);
     /* alloc root node */
@@ -84,6 +85,26 @@ bool btree_insert(const char *idxname, Data *target,u32 value)
     freeNode(&bt, &nd);
     saveBtree(&bt);
     return true;
+}
+
+const char* btree_getTable(const char* idxname)
+{
+    /* generate the index filename */
+    char filename[259];
+    strcpy(filename, idxname);
+    strcat(filename, ".idx");
+    /* check the index file */
+    if (_access(filename, 0) != 0)
+    {
+        fprintf(stderr, "Index Not Exists!\n");
+        return NULL;
+    }
+    /* buffer for write */
+    static Buffer buf;
+    buffer_init(&buf, filename);
+    /* get index attributes */
+    move_window(&buf, 0);
+    return (const char*)(buf.win + TABLENAME);
 }
 
 //u32 btree_delete(const char* idxname , Rule* rule)
@@ -358,6 +379,7 @@ set<u32> btree_select(const char* idxname, Rule * rule)
         return res;
     }
     node nd;
+
     u32 head = bt.head;
     switch (rule->cmp)
     {
