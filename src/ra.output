@@ -3,7 +3,6 @@ Terminals unused in grammar
    LS
    RS
    NEWLINE
-   FNAME
 
 
 Grammar
@@ -21,7 +20,7 @@ Grammar
     7          | DELETE_S
     8          | INSERT_S
     9          | QUIT
-   10          | EXEC NAME
+   10          | EXEC FNAME
 
    11 SELECT_S: SELECT STAR FROM NAME WHERE TJS TM
    12         | SELECT STAR FROM NAME TM
@@ -94,7 +93,7 @@ STAR (275) 11 12
 tCHAR (276) 22 23
 tFLOAT (277) 26 27
 tINT (278) 24 25
-NAME (279) 10 11 12 15 16 17 18 19 22 23 24 25 26 27 28 40 41 42 43
+NAME (279) 11 12 15 16 17 18 19 22 23 24 25 26 27 28 40 41 42 43
 INTEGER (280) 15 22 23 30
 FF (281) 16 31
 LS (282)
@@ -111,7 +110,7 @@ KEY (292) 18
 INDEX (293) 19 43
 ON (294) 19
 AND (295) 14
-FNAME (296)
+FNAME (296) 10
 
 
 Nonterminals, with rules where they appear
@@ -222,9 +221,9 @@ state 6
 
 state 7
 
-   10 statement: EXEC . NAME
+   10 statement: EXEC . FNAME
 
-    NAME  shift, and go to state 23
+    FNAME  shift, and go to state 23
 
 
 state 8
@@ -352,7 +351,7 @@ state 22
 
 state 23
 
-   10 statement: EXEC NAME .
+   10 statement: EXEC FNAME .
 
     $default  reduce using rule 10 (statement)
 

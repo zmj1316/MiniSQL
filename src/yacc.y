@@ -52,7 +52,7 @@ statement 	:  SELECT_S		{printf("select done\n");}
 			|  DELETE_S		{printf("delete done\n");}
 			|  INSERT_S     {printf("insert done\n");}
 			|  QUIT			{exit(0);}
-			|  EXEC NAME    {
+			|  EXEC FNAME    {
 							close(0);
 							fprintf(stdout,"Opening %s\n",(char*)$2);
     						if ( freopen((char*)$2, "r", stdin) == NULL ){
