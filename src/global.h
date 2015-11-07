@@ -12,6 +12,7 @@
 #define BLOCKSIZE 4096
 #define MAXCOLUMN 128
 
+/* use tinybuf to recuce memory use by disable cache in buffer module*/
 //#define TINYBUF
 
 typedef long i64;                  /* 8-byte signed integer */

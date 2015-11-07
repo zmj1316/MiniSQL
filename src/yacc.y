@@ -159,7 +159,7 @@ CREATE_S 	 : CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM {
 			 {
 			 	table * tp = miniSQL_connectTable((const char*)$5);
 				if(tp == NULL) {fprintf(stderr,"Table %s Not Exist!\n",(char*)$5); return 0;}
-				puts((char*)$3);
+				//puts((char*)$3);
 				miniSQL_createIndex(tp,(char*)$7,(char*)$3);
 				miniSQL_disconnectTable(tp);
 			 };
@@ -232,6 +232,10 @@ ATTR 		 : NAME tCHAR CC INTEGER CC {
 INSERT_S     : INSERT INTO NAME VALUES CC VALUESS CC TM{
 				table * tp = miniSQL_connectTable((const char*)$3);
 				if(tp == NULL) {fprintf(stderr,"Table %s Not Exist!\n",(char*)$3); return 0;}
+				if(rcd.i.size()!=tp->colNum_u64){
+					fprintf(stderr,"column number not match, get %d |expect %d.\n",rcd.i.size(),tp->colNum_u64);
+					goto IIE;
+				}
 				for(int i = 0 ; i < tp->colNum_u64; i++){
 					if(tp->col[i].type!=rcd.i[i].type){
 						if(rcd.i[i].type == INT && tp->col[i].type == FLOAT){
@@ -246,6 +250,7 @@ INSERT_S     : INSERT INTO NAME VALUES CC VALUESS CC TM{
 				}
 				rcd.valid = true;
 				miniSQL_insert(tp, &rcd);
+				IIE:
 				miniSQL_disconnectTable(tp);
 				rcd.i.clear();
 }

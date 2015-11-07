@@ -45,6 +45,13 @@ table* miniSQL_connectTable(const char* tablename)
 bool miniSQL_dropTable(table* tb)
 {
     fprintf(stdout, "droping table %s\n", tb->name_str);
+    for (size_t i = 0; i < tb->colNum_u64; i++)
+    {
+        if (tb->col[i].idxname[0]!=0)// index exists
+        {
+            miniSQL_dropIndex(tb->col[i].idxname);
+        }
+    }
     char filename[259];
     strcpy(filename, tb->name_str);
     strcat(filename, ".db");
@@ -100,7 +107,12 @@ bool miniSQL_dropIndex(const char* idxname)
     char filename[259];
     strcpy(filename, idxname);
     strcat(filename, ".idx");
-    strcpy(tablename,btree_getTable(idxname));
+    const char * t = btree_getTable(idxname);
+    if (t==NULL)
+    {
+        return false;
+    }
+    strcpy(tablename,t);
     table *tb = miniSQL_connectTable(tablename);
     for (size_t i = 0; i < tb->colNum_u64; i++)
     {

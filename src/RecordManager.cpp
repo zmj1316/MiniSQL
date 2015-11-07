@@ -8,6 +8,8 @@
 #include <stdio.h>
 #include<vector>
 #include<set>
+#include <algorithm>
+#include <iterator>
 using namespace std;
 
 void *mallocZero(int n) {
@@ -336,6 +338,8 @@ int Recordmanager_deleteRecord(table *tab, Filter *filter)
 
 
         }
+        tab->buf.dirty = true;
+        sync_window(&tab->buf);
         return num;
     }
     for (size_t i = 0; i < tab->recordNum; i++)
@@ -379,93 +383,14 @@ int Recordmanager_deleteRecord(table *tab, Filter *filter)
     return num;
 }
 
-///*3*/
-//int Recordmanager_deleteRecordwithIndex(
-//    table *tab, Filter *flt, vector<const char *> idxname, vector<u32> idx)
-//{
-//    int num = 0;
-//    record *rcd;
-//    int capacity = BLOCKSIZE / (tab->recordSize + 1);
-//    u32 recordcount = 0;
-//    for (size_t block = 0; recordcount < tab->recordNum; block++)
-//    {
-//        move_window(&tab->buf, block);
-//        for (size_t i = 0; i < capacity; i++)
-//        {
-//            u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
-//            record *r = binary2record(tab, bin);
-//            if (r->valid == false)
-//            {
-//                continue;
-//            }
-//            else
-//            {
-//                recordcount++;
-//            }
-//            bool res = true;
-//            for (vector<Rule>::iterator it = filter->rules.begin(); it != filter->rules.end(); ++it)
-//            {
-//                Rule rule = (*it);
-//                if (0 == Rule_cmp(r->i[rule.colNo].type, &r->i[rule.colNo].data, &rule.target, rule.cmp))
-//                {
-//                    res = false;
-//                    break;
-//                }
-//            }
-//            if (res)
-//            {
-//                r->valid = false;
-//                record2binary(tab, bin, r);
-//                tab->buf.dirty = true;
-//            }
-//        }
-//    }
-//    tab->buf.dirty = true;
-//    sync_window(&tab->buf);
-//    return num;
-//}
-///*2*/
-//int Recordmanager_deleteRecordwithIndex(
-//    table *tab, Filter *flt, vector<const char *> idxname, Rule rule)
-//{
-//    int num = 0;
-//    record *rcd;
-//    vector<Rule>::iterator fiter;
-//    vector<const char *>::iterator iter;
-//    vector<u32>::iterator iter2;
-//    int c = BLOCKSIZE / (tab->recordSize + 1);
-//    for (int i = 1; i <= (tab->recordNum - 1) / c + 1; i++)
-//    {
-//        move_window(&(tab->buf), i);
-//        for (int j = 0; j < c; j++)
-//        {
-//            rcd = binary2record(tab, tab->buf.win + j * tab->recordSize);
-//            if (rcd->valid == true)
-//            {
-//                for (fiter = flt->rules.begin(); fiter != flt->rules.end(); fiter++)
-//                {
-//                    if (Rule_cmp(rcd->i[fiter->colNo].type, &rcd->i[fiter->colNo].data, &fiter->target, fiter->cmp))
-//                    {
-//                        rcd->valid = false;
-//                        record2binary(tab, tab->buf.win + j * tab->recordSize, rcd);
-//                        num++;
-//                    }
-//                }
-//            }
-//        }
-//    }
-//    for (iter = idxname.begin(), iter2 = idx.begin(); iter != idxname.end(); iter++, iter2++)
-//        btree_delete_node(*iter, &rcd->i[*iter2].data);
-//
-//    return num;
-//}
-
 vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
 {
     // check index
     const char * idxname = NULL;
     u32 colidx = -1;
     Rule *r = NULL;
+    const char * idxname2 = NULL;
+    Rule *r2 = NULL;
     vector<record> result;
     u32 capacity = BLOCKSIZE / (tab->recordSize + 1);
 
@@ -473,16 +398,35 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
     {
         if (tab->col[(*it).colNo].idxname[0] != 0 && (*it).cmp != NE) // index exists and is not NE condition
         {
+            if (idxname!=NULL)
+            {
+                idxname2 = tab->col[(*it).colNo].idxname;
+                r2 = &(*it);
+                break;
+            }
             idxname = tab->col[(*it).colNo].idxname;
             colidx = (*it).colNo;
             r = &(*it);
-            break;
+            //break;
         }
     }
-    if (r!=NULL) // select with index
+    if (r != NULL) // select with index
     {
-        set<u32> blockset = btree_select(idxname, r);
-        for (set<u32>::iterator it = blockset.begin(); it != blockset.end(); ++it)
+        set<u32> blockset1 = btree_select(idxname, r);
+        // the code commented is for multi-index optimize 
+        // but it seems not to improve performance as btree costs more time ToT
+        //set<u32> blockset;
+        //if (r2 != NULL)
+        //{
+        //    set<u32> blockset2 = btree_select(idxname2, r2);
+        //    set_intersection(blockset1.begin(), blockset1.end(), blockset2.begin(), blockset2.end(), inserter(blockset,blockset.begin()));
+        //}
+        //else
+        //{
+        //    blockset = blockset1;
+        //}
+        // search in blocks
+        for (set<u32>::iterator it = blockset1.begin(); it != blockset1.end(); ++it)
         {
             move_window(&tab->buf, *it);
             for (size_t i = 0; i < capacity; i++)
@@ -508,8 +452,6 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
                     result.push_back(r);
                 }
             }
-
-
         }
     }
     else    // without index
@@ -541,32 +483,7 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
     }
     return result;
 }
-//
-//vector<record> Recordmanager_selectRecordwithIndex(table* tab, Filter *flt, const char *idxname, Rule *rule)
-//{
-//    record *rcd;
-//    vector<record> result;
-//    vector<Rule>::iterator iter;
-//    set<u32> blockset = btree_select(idxname, rule);
-//    set<u32>::iterator siter;
-//    int c = BLOCKSIZE / (tab->recordSize + 1);
-//    for (siter = blockset.begin(); siter != blockset.end(); siter++)
-//    {
-//        move_window(&(tab->buf), *siter);
-//        for (int j = 0; j < c; j++)
-//        {
-//            rcd = binary2record(tab, tab->buf.win + j * tab->recordSize);
-//            if (flt->rules.size() != 0)
-//                for (iter = flt->rules.begin(); iter != flt->rules.end(); iter++)
-//                {
-//                    if (Rule_cmp(rcd->i[iter->colNo].type, &rcd->i[iter->colNo].data, &iter->target, iter->cmp))
-//                        result.push_back(*rcd);
-//                }
-//        }
-//    }
-//    tab->buf.dirty = true;
-//    return result;
-//}
+
 bool Recordmanager_addindex(table* tb,const char * idxname,u32 colidx)
 {
     bool rc = true;

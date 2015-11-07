@@ -1,3 +1,8 @@
+/*
+* (C) 2015 Key Zhang
+* @btree.h
+* @Created on 2015/10/19
+*/
 #ifndef _BTREE_H
 #define _BTREE_H
 
@@ -24,33 +29,37 @@
 #include <set>
 #include <io.h>
 using namespace std;
+/********************/
 /* Public Functions */
-bool btree_create(
-    const char* tablename,
-    const char *,   // index name
-    column *col     // column to build index
+/********************/
+
+/* create index on table */
+bool btree_create(  
+    const char* tablename,  // table name
+    const char *,           // index name
+    column *col             // column to build index
     );
+/* insert data into index */
 bool btree_insert(
-    const char *,   // index name
-    Data* i,         // Data to insert
-    u32 value       // value(blocknum)
+    const char *,        // index name
+    Data* i,             // Data to insert
+    u32 value            // value(blocknum)
     );
-const char* btree_getTable(
-    const char* idxname
+/* get tablename from index name */
+const char* btree_getTable( // NULL: index not exist
+    const char* idxname     // index name
 );
-//u32 btree_delete(
-//    const char *,
-//    Rule *
-//    );
-u32 btree_delete_node(
-    const char *,
-    Data *
+/* delete a data entry in index */
+u32 btree_delete_node(      // 0: not deleted 1:deleted
+    const char *,           // index name
+    Data *                  // data to delete (for once)
     );
 set<u32> btree_select(
     const char *,   // index name
     Rule *        // Filter    
     );
 
+/***********/
 /* Private */
 class node
 {
@@ -81,25 +90,22 @@ struct btree
     u32 head;
 };
 typedef struct btree btree;
-//static void insert(btree *, node *);
-//u32 btree_delete_node(
-//    btree *,   // index name
-//    Data*         // Filter
-//    );
-static bool getBtree(btree*, const char *);
-static void saveBtree(btree*);
 
-static void getNode(btree*,node * ,u32 block);
-static void newNode(btree*, node *);
-static void freeNode(btree*, node *);
-static void saveNode(btree*, node *);
+static bool getBtree(btree*, const char *);                 // get btree from index name
+static void saveBtree(btree*);                              // save btree info
 
-static void findNode(btree*, node*, Data*);
-static void splitNode(btree*, node*source,node*dst);
+static void getNode(btree*,node * ,u32 block);              // get node from blocknum
+static void newNode(btree*, node *);                        // alloc new node
+static void freeNode(btree*, node *);                       // recycle mem
+static void saveNode(btree*, node *);                       // save node info
 
-static i8 cmp(dataType type, Data sourse,Data target);
-static void datacpy(btree* bt, Data *dst, Data *source);
+static void findNode(btree*, node*, Data*);                 // find node through btree by data
+static void splitNode(btree*, node*source,node*dst);        // split node into 2 by half
 
+static i8 cmp(dataType type, Data sourse,Data target);      // compare 2 data in 3type
+static void datacpy(btree* bt, Data *dst, Data *source);    // copy data
+
+// insert data into node by index
 static void insertData(btree*,node *nd, u32 index, Data* target, u32 value);
 static void insertNonleaf(btree*, node*, u32 parent);
 

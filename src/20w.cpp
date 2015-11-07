@@ -1,5 +1,5 @@
 #include "MiniSQL.h"
-int main()
+int main2()
 {
     table *tb = miniSQL_connectTable("orders");
     record r;
@@ -37,18 +37,22 @@ int main()
     return 0;
 }
 
-int main2()
+int main()
 {
-    table *tb = miniSQL_connectTable("orders");
-    tb->recordNum = 200000;
+    table *tb = miniSQL_connectTable("teacher");
+    //tb->recordNum = 200000;
     Filter f;
     Rule r;
-    r.target.i = 198800;
-    r.cmp = GT;
+    r.target.str = "003";
+    r.cmp = EQ;
     r.colNo = 0;
     f.rules.push_back(r);
-    auto rr = miniSQL_delete(tb, &f);
-    printf("%d\n", rr);
+    //r.target.f = 18;
+    //r.cmp = LT;
+    //r.colNo = 3;
+    //auto rr = miniSQL_delete(tb, &f);
+    //printf("%d\n", rr);
+    miniSQL_delete(tb, &f);
     miniSQL_disconnectTable(tb);
     return 0;
 }

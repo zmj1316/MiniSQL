@@ -93,24 +93,24 @@ public:
 /*********************/
 /* Public Functions  */
 /*********************/
-
+/* create table by table object */
 bool miniSQL_createTable(
     table *             /* Table */
     );
-
-table *miniSQL_connectTable(
+/* connnect table by table name */
+table *miniSQL_connectTable(// NULL: no table
     const char *tablename
     );
-
+/* drop table by table object */
 bool miniSQL_dropTable(
     table *         /* Table name*/
     );
-
+/* select in table by Filter and table */
 vector<record> miniSQL_select(
     table *,
     Filter *
     );
-
+/* insert into table */
 bool miniSQL_insert(
     table *,
     record *
@@ -121,21 +121,22 @@ u32 miniSQL_delete(
     );
 bool miniSQL_createIndex(
     table *,
-    const char * columnname,
-    const char * indexname
+    const char * columnname,     // column name
+    const char * indexname       // index name
     );
 bool miniSQL_dropIndex(
-    //table *,
-    //u32 index
-    const char *
+    const char *                 // index name 
     );
+/* Warnning disconnect after you have done any change on table */
 void miniSQL_disconnectTable(
     table *
     );
+/* an awful output of select result */
 void printRecord(record r);
 void printVrecord(vector<record> r);
-/***************/
-
+/*************************************/
+/* private function for other modules*/
+/*************************************/
 u8 Rule_cmp(dataType type, Data* s, Data *dst, Rule *);
 
  #endif /* _MINISQL_H */
