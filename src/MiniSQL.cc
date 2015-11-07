@@ -59,9 +59,11 @@ bool miniSQL_dropTable(table* tb)
     if (_access(filename, 0) != 0)
     {
         fprintf(stderr, "File %s not Exists!\n", filename);
-        return false;
     }
-    remove(filename);
+    else
+    {
+        remove(filename);
+    }
     return catalog_dropTable(tb);
 }
 

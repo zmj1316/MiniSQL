@@ -83,9 +83,9 @@ ws       [ \t]+
   return NAME;
 }
 
-[a-zA-Z0-9_]+\.*[a-zA-Z0-9_]* {
+[a-zA-Z0-9_]+\.+[a-zA-Z0-9_]* {
   yylval = _strdup(yytext);
-  puts("Fname");
+  puts((char*)yylval);
   return FNAME;
 }
 

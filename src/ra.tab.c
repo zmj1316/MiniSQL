@@ -1502,7 +1502,7 @@ yyreduce:
     {
 							close(0);
 							fprintf(stdout,"Opening %s\n",(char*)(yyvsp[(2) - (2)]));
-    						if ( freopen((char*)(yyvsp[(2) - (2)]), "r", stdin) == NULL ){
+    						if (freopen((char*)(yyvsp[(2) - (2)]), "r", stdin) == NULL ){
     						    fprintf(stderr,"Could not open %s\n",(char*)(yyvsp[(2) - (2)]));
     						    return 1;
     						}

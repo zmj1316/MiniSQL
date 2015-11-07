@@ -55,7 +55,7 @@ statement 	:  SELECT_S		{printf("select done\n");}
 			|  EXEC FNAME    {
 							close(0);
 							fprintf(stdout,"Opening %s\n",(char*)$2);
-    						if ( freopen((char*)$2, "r", stdin) == NULL ){
+    						if (freopen((char*)$2, "r", stdin) == NULL ){
     						    fprintf(stderr,"Could not open %s\n",(char*)$2);
     						    return 1;
     						}
