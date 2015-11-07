@@ -210,61 +210,7 @@ bool Recordmanager_insertRecord(table* tab, record* rcd)
     }
     return rc;
 }
-//
-//bool Recordmanager_insertRecordwithIndex(table *tab, record *rcd, vector<const char *> idxname, vector<u32> idx)
-//{
-//    bool rc = true;
-//    vector<u32> vct;
-//    for (u32 k = 0; k < tab->colNum_u64; k++)
-//        if (tab->col[k].unique_u8)
-//            vct.push_back(k);
-//
-//    u32 recordcount = 0;
-//    u32 capacity = BLOCKSIZE / (tab->recordSize + 1);
-//
-//    for (size_t block = 0; recordcount < tab->recordNum; block++)
-//    {
-//        move_window(&tab->buf, block);
-//        for (size_t i = 0; i < capacity; i++)
-//        {
-//            u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
-//            record *r = binary2record(tab, bin);
-//            if (r->valid == false)
-//            {
-//                continue;
-//            }
-//            else
-//            {
-//                recordcount++;
-//            }
-//            for (vector<u32>::iterator it = vct.begin(); it != vct.end(); ++it)
-//            {
-//                if (Rule_cmp(tab->col[*it].type, &r->i[*it].data, &rcd->i[*it].data, EQ))
-//                {
-//                    fprintf(stderr, "Unique check failure.");
-//                    return false;
-//                }
-//            }
-//        }
-//    }
-//    if (tab->recordNum % capacity == 0)
-//    {
-//        newBlock(&(tab->buf));
-//    }
-//    move_window(&(tab->buf), (++tab->recordNum - 1) / capacity);
-//    record2binary(tab, tab->buf.win + (tab->recordNum - 1) % capacity, rcd);
-//    vector<const char *>::iterator idxnameit;
-//    vector<u32>::iterator idxit;
-//    for (idxnameit = idxname.begin(), idxit = idx.begin(); idxnameit != idxname.end() && idxit != idx.end(); ++idxnameit, ++idxit)
-//    {
-//        rc &= btree_insert(*idxnameit, &rcd->i[*idxit].data, (tab->recordNum - 1) / capacity);
-//    }
-//    tab->buf.dirty = true;
-//    sync_window(&tab->buf);
-//    return rc;
-//}
 
-/*1*/
 int Recordmanager_deleteRecord(table *tab, Filter *filter)
 {
     bool rc = true;

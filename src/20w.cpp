@@ -1,3 +1,7 @@
+/* This file is for debug only
+ *
+ *
+ */
 #include "MiniSQL.h"
 int main2()
 {
