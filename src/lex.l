@@ -83,11 +83,7 @@ ws       [ \t]+
   return NAME;
 }
 
-[a-zA-Z0-9_]+\.+[a-zA-Z0-9_]* {
-  yylval = _strdup(yytext);
-  puts((char*)yylval);
-  return FNAME;
-}
+
 
 [()] {return CC;}
 
@@ -106,7 +102,11 @@ ws       [ \t]+
   yylval = f;
   return FF;
 }
-
+[a-zA-Z0-9_]+\.+[a-zA-Z0-9_]* {
+  yylval = _strdup(yytext);
+  puts((char*)yylval);
+  return FNAME;
+}
 \-?{digit}+ {
   // found an integer
   long *f = (long*)malloc(sizeof(long));

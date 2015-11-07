@@ -396,15 +396,15 @@ struct yy_trans_info
 static yyconst flex_int16_t yy_accept[138] =
     {   0,
         0,    0,    0,    0,   44,   42,    2,    3,    3,    1,
-       42,   38,   25,   26,   42,   41,   24,   15,   17,   19,
+       42,   37,   25,   26,   42,   41,   24,   15,   17,   19,
        36,   42,   36,   36,   36,   36,   36,   36,   36,   36,
        36,   36,   36,   36,   36,   36,   36,   28,   29,   43,
-        2,    3,    1,    1,    0,   39,   41,   37,   41,    0,
-       16,   18,   20,   37,   36,   36,   36,   36,   36,   36,
+        2,    3,    1,    1,    0,   38,   41,   40,   41,    0,
+       16,   18,   20,   40,   36,   36,   36,   36,   36,   36,
        36,   36,   36,   36,   36,   35,   36,   36,   36,   36,
-       36,   36,   36,    0,   37,   37,   30,   36,   36,   36,
+       36,   36,   36,    0,   39,   40,   30,   36,   36,   36,
        36,   36,   36,   36,   36,   36,   23,   33,   36,   36,
-       36,   36,   36,   36,   36,   40,   21,   36,   36,    5,
+       36,   36,   36,   36,   36,   39,   21,   36,   36,    5,
 
        36,   36,   12,   36,   36,   13,   36,    9,   36,   36,
        36,   36,   36,   36,   36,   36,   22,   34,   36,   36,
@@ -575,7 +575,7 @@ static yyconst flex_int16_t yy_chk[313] =
 static yyconst flex_int32_t yy_rule_can_match_eol[44] =
     {   0,
 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 
     0, 0, 0, 0,     };
 
 static yy_state_type yy_last_accepting_state;
@@ -1086,22 +1086,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 86 "lex.l"
-{
-  yylval = _strdup(yytext);
-  puts((char*)yylval);
-  return FNAME;
-}
-	YY_BREAK
-case 38:
-YY_RULE_SETUP
-#line 92 "lex.l"
+#line 88 "lex.l"
 {return CC;}
 	YY_BREAK
-case 39:
-/* rule 39 can match eol */
+case 38:
+/* rule 38 can match eol */
 YY_RULE_SETUP
-#line 94 "lex.l"
+#line 90 "lex.l"
 {
   char *tmp =  _strdup(yytext);
   tmp[strlen(tmp) - 1]=0;
@@ -1110,15 +1101,24 @@ YY_RULE_SETUP
   return STRING;
 }
 	YY_BREAK
-case 40:
+case 39:
 YY_RULE_SETUP
-#line 102 "lex.l"
+#line 98 "lex.l"
 {
   // found an float
   float * f = (float*)malloc(sizeof(float));
   *f = strtof(yytext, NULL);
   yylval = f;
   return FF;
+}
+	YY_BREAK
+case 40:
+YY_RULE_SETUP
+#line 105 "lex.l"
+{
+  yylval = _strdup(yytext);
+  puts((char*)yylval);
+  return FNAME;
 }
 	YY_BREAK
 case 41:
