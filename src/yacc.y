@@ -74,13 +74,14 @@ SELECT_S 	 : SELECT  STAR FROM NAME WHERE TJS  TM {
 							}
 							else{
 								fprintf(stderr,"type of %s not match!\n",(*i).name);
-								return 0;
+								goto SSE;
 							}
 						}
 					}
 					filter.rules.push_back(rule);
 				}
 				printVrecord(miniSQL_select(tb,&filter));
+				SSE:
 				filter.rules.clear();
 				Tdatas.clear();
 }
@@ -121,7 +122,8 @@ TJ			: NAME FL INTEGER {
 				TData t;
 				t.name = (char*) $1;
 				t.cmp = cmp;
-				t.i.data.str = (char*)$3;
+				t.i.data.str = new char[256];
+				strcpy(t.i.data.str,(char*)$3);
 				t.i.type = CHAR;
 				Tdatas.push_back(t);
 				}
@@ -137,6 +139,10 @@ CREATE_S 	 : CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM {
 						tb.primarykey_u8 = i;
 						tb.col[i].unique_u8 = 1;
 						miniSQL_createTable(&tb);
+						table *tp = miniSQL_connectTable((char*)$3);
+						if(tp == NULL) {fprintf(stderr,"Create failed!\n");return 0;}
+						miniSQL_createIndex(tp,(char*)$10,(char*)$10);
+						miniSQL_disconnectTable(tp);
 						tb.colNum_u64=0;
 					}
 				}
@@ -248,7 +254,8 @@ INSERT_S     : INSERT INTO NAME VALUES CC VALUESS CC TM{
 VALUE 		 : STRING	{
 					item i;
 					i.type = CHAR;
-					i.data.str = (char*)$1;
+					i.data.str = new char[256];
+					strcpy(i.data.str,(char*)$1);
 					rcd.i.push_back(i);
 					}
 			 | INTEGER	{

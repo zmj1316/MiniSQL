@@ -167,7 +167,7 @@ u32 btree_delete_node(const char * idxname,Data * data)
     for (i = 0; i < nd.N && cmp(bt.type, nd.datas[i], *data) != 0; i++);
     if (i>=nd.N )
     {
-        fprintf(stderr, "No data to delete!\n");
+        //fprintf(stderr, "No data to delete!\n");
         return 0;
     }
     deleteData(&bt, &nd, i);
@@ -396,20 +396,39 @@ set<u32> btree_select(const char* idxname, Rule * rule)
         head = nd.nodeNo;
         break;
     }
+    if (rule->cmp == EQ)
+    {
+        getNode(&bt, &nd, head);
+
+        for (size_t i = 0; i < nd.N; i++)
+        {
+            if (Rule_cmp(bt.type, &nd.datas[i], &rule->target, rule) == 1)
+            {
+                res.insert(nd.childs[i]);
+            }
+        }
+        return res;
+    }
     while (head!=NONEXT)
     {
         getNode(&bt, &nd, head);
+        
         for (size_t i = 0; i < nd.N; i++)
         {
             if (Rule_cmp(bt.type,&nd.datas[i],&rule->target,rule)==1)
             {
                 res.insert(nd.childs[i]);
             }
-            else
+            else if(!res.empty())
             {
                 freeNode(&bt, &nd);
                 return res;
             }
+        }
+        if (res.empty())
+        {
+            freeNode(&bt, &nd);
+            return res;
         }
         head = nd.next;
     }
@@ -526,8 +545,8 @@ void freeNode(btree* bt, node* nd)
             free(nd->datas[i].str);
         }
     }
-    free(nd->datas);
-    free(nd->childs);
+    //free(nd->datas);
+    //free(nd->childs);
 }
 
 void saveNode(btree* bt, node* nd)
@@ -630,7 +649,7 @@ i8 cmp(dataType type, Data sourse, Data target)// 1: GT 0:EQ -1: LT
         break;
     }
     if (cmp > 0) return 1;
-    if (cmp < 0.001 && cmp > -0.001) return 0;
+    if (cmp < 0.000001 && cmp > -0.000001) return 0;
     return -1;
 }
 

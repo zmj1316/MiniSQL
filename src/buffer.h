@@ -4,7 +4,7 @@
 
 /* Buffer Section */
 
-#define CACHESIZE 64
+#define CACHESIZE 256
 
 struct Buffer
 {

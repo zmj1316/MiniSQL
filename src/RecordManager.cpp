@@ -267,6 +267,20 @@ int Recordmanager_deleteRecord(table *tab, Filter *filter)
 {
     bool rc = true;
     int num = 0;
+    const char * idxname = NULL;
+    u32 colidx = -1;
+    Rule *r = NULL;
+
+    for (vector<Rule>::iterator it = filter->rules.begin(); it != filter->rules.end(); ++it)
+    {
+        if (tab->col[(*it).colNo].idxname[0] != 0 && (*it).cmp != NE) // index exists and is not NE condition
+        {
+            idxname = tab->col[(*it).colNo].idxname;
+            colidx = (*it).colNo;
+            r = &(*it);
+            break;
+        }
+    }
     // check index
     vector<u32> colNums;
     vector<const char*> idxnames;
@@ -279,10 +293,55 @@ int Recordmanager_deleteRecord(table *tab, Filter *filter)
         }
     }
     u32 capacity = BLOCKSIZE / (tab->recordSize + 1);
+    if (r != NULL) // delete with index
+    {
+        set<u32> blockset = btree_select(idxname, r);
+        for (set<u32>::iterator it = blockset.begin(); it != blockset.end(); ++it)
+        {
+            move_window(&tab->buf, *it);
+            for (size_t i = 0; i < capacity; i++)
+            {
+                u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
+                record r = binary2record(tab, bin);
+                if (r.valid == false)
+                {
+                    continue;
+                }
+                bool res = true;
+                for (vector<Rule>::iterator it = filter->rules.begin(); it != filter->rules.end(); ++it)
+                {
+                    Rule rule = (*it);
+                    if (0 == Rule_cmp(r.i[rule.colNo].type, &r.i[rule.colNo].data, &rule.target, rule.cmp))
+                    {
+                        res = false;
+                        break;
+                    }
+                }
+                if (res)// match 
+                {
+                    *bin = 0;// valid = false
+                    tab->buf.dirty = true;
+                    num++;
+                    if (colNums.size() != 0)      // index exists
+                    {
+                        vector<const char *>::iterator idxnameit;
+                        vector<u32>::iterator idxit;
+                        for (idxnameit = idxnames.begin(), idxit = colNums.begin(); idxnameit != idxnames.end() && idxit != colNums.end(); ++idxnameit, ++idxit)
+                        {
+                            btree_delete_node(*idxnameit, &r.i[*idxit].data);
+                        }
+                    }
+                }
+            }
+
+
+        }
+        return num;
+    }
     for (size_t i = 0; i < tab->recordNum; i++)
     {
         move_window(&tab->buf, i / capacity);
-        u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
+        u8 *bin = tab->buf.win + (i % capacity) * (tab->recordSize + 1);
         record r = binary2record(tab, bin);
         if (r.valid == false)
         {
@@ -412,11 +471,12 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
 
     for (vector<Rule>::iterator it = flt->rules.begin(); it != flt->rules.end(); ++it)
     {
-        if (tab->col[(*it).colNo].idxname[0] != 0) // index exists
+        if (tab->col[(*it).colNo].idxname[0] != 0 && (*it).cmp != NE) // index exists and is not NE condition
         {
             idxname = tab->col[(*it).colNo].idxname;
             colidx = (*it).colNo;
-            r = &flt->rules[colidx];
+            r = &(*it);
+            break;
         }
     }
     if (r!=NULL) // select with index
@@ -457,7 +517,7 @@ vector<record> Recordmanager_selectRecord(table* tab, Filter* flt)
         for (size_t i = 0; i < tab->recordNum; i++)
         {
             move_window(&tab->buf, i / capacity);
-            u8 *bin = tab->buf.win + i * (tab->recordSize + 1);
+            u8 *bin = tab->buf.win + (i % capacity) * (tab->recordSize + 1);
             record r = binary2record(tab, bin);
             if (r.valid == false)
             {
@@ -514,7 +574,7 @@ bool Recordmanager_addindex(table* tb,const char * idxname,u32 colidx)
     for (size_t i = 0; i < tb->recordNum; i++)
     {
         move_window(&tb->buf, i / capacity);
-        u8 *bin = tb->buf.win + i * (tb->recordSize + 1);
+        u8 *bin = tb->buf.win + (i % capacity) * (tb->recordSize + 1);
         record r = binary2record(tb, bin);
         if (r.valid == false)
         {

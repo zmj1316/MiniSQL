@@ -133,6 +133,8 @@ void miniSQL_disconnectTable(table* tb)
 
 void printRecord(record r)
 {
+    //FILE *fp;
+    //fp = fopen("Recordoutput.txt", "w");
     for (vector<item>::iterator it = r.i.begin(); it < r.i.end(); ++it)
     {
         item i = *it;

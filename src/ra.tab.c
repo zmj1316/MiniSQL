@@ -490,10 +490,10 @@ static const yytype_int8 yyrhs[] =
 static const yytype_uint16 yyrline[] =
 {
        0,    39,    39,    42,    43,    46,    47,    48,    49,    50,
-      51,    54,    87,   100,   101,   104,   112,   120,   132,   152,
-     161,   162,   165,   174,   184,   194,   204,   214,   226,   248,
-     254,   260,   268,   269,   272,   273,   274,   275,   276,   277,
-     280,   315,   328,   337
+      51,    54,    88,   101,   102,   105,   113,   121,   134,   158,
+     167,   168,   171,   180,   190,   200,   210,   220,   232,   254,
+     261,   267,   275,   276,   279,   280,   281,   282,   283,   284,
+     287,   322,   335,   344
 };
 #endif
 
@@ -1518,13 +1518,14 @@ yyreduce:
 							}
 							else{
 								fprintf(stderr,"type of %s not match!\n",(*i).name);
-								return 0;
+								goto SSE;
 							}
 						}
 					}
 					filter.rules.push_back(rule);
 				}
 				printVrecord(miniSQL_select(tb,&filter));
+				SSE:
 				filter.rules.clear();
 				Tdatas.clear();
 ;}
@@ -1533,7 +1534,7 @@ yyreduce:
   case 12:
 
 /* Line 1455 of yacc.c  */
-#line 88 "yacc.y"
+#line 89 "yacc.y"
     {
 			 	table *tb;
 				if((tb = miniSQL_connectTable((char*)(yyvsp[(4) - (5)]))) == NULL){
@@ -1549,7 +1550,7 @@ yyreduce:
   case 15:
 
 /* Line 1455 of yacc.c  */
-#line 104 "yacc.y"
+#line 105 "yacc.y"
     {
 				TData t;
 				t.name = (char*) (yyvsp[(1) - (3)]);
@@ -1563,7 +1564,7 @@ yyreduce:
   case 16:
 
 /* Line 1455 of yacc.c  */
-#line 112 "yacc.y"
+#line 113 "yacc.y"
     {
 				TData t;
 				t.name = (char*) (yyvsp[(1) - (3)]);
@@ -1577,12 +1578,13 @@ yyreduce:
   case 17:
 
 /* Line 1455 of yacc.c  */
-#line 120 "yacc.y"
+#line 121 "yacc.y"
     {
 				TData t;
 				t.name = (char*) (yyvsp[(1) - (3)]);
 				t.cmp = cmp;
-				t.i.data.str = (char*)(yyvsp[(3) - (3)]);
+				t.i.data.str = new char[256];
+				strcpy(t.i.data.str,(char*)(yyvsp[(3) - (3)]));
 				t.i.type = CHAR;
 				Tdatas.push_back(t);
 				;}
@@ -1591,7 +1593,7 @@ yyreduce:
   case 18:
 
 /* Line 1455 of yacc.c  */
-#line 132 "yacc.y"
+#line 134 "yacc.y"
     {
 				strcpy(tb.name_str,(char*)(yyvsp[(3) - (13)]));
 				for(int i = 0; i < tb.colNum_u64;i++){
@@ -1600,6 +1602,10 @@ yyreduce:
 						tb.primarykey_u8 = i;
 						tb.col[i].unique_u8 = 1;
 						miniSQL_createTable(&tb);
+						table *tp = miniSQL_connectTable((char*)(yyvsp[(3) - (13)]));
+						if(tp == NULL) {fprintf(stderr,"Create failed!\n");return 0;}
+						miniSQL_createIndex(tp,(char*)(yyvsp[(10) - (13)]),(char*)(yyvsp[(10) - (13)]));
+						miniSQL_disconnectTable(tp);
 						tb.colNum_u64=0;
 					}
 				}
@@ -1617,7 +1623,7 @@ yyreduce:
   case 19:
 
 /* Line 1455 of yacc.c  */
-#line 153 "yacc.y"
+#line 159 "yacc.y"
     {
 			 	table * tp = miniSQL_connectTable((const char*)(yyvsp[(5) - (9)]));
 				if(tp == NULL) {fprintf(stderr,"Table %s Not Exist!\n",(char*)(yyvsp[(5) - (9)])); return 0;}
@@ -1630,21 +1636,21 @@ yyreduce:
   case 20:
 
 /* Line 1455 of yacc.c  */
-#line 161 "yacc.y"
+#line 167 "yacc.y"
     {;}
     break;
 
   case 21:
 
 /* Line 1455 of yacc.c  */
-#line 162 "yacc.y"
+#line 168 "yacc.y"
     {;}
     break;
 
   case 22:
 
 /* Line 1455 of yacc.c  */
-#line 165 "yacc.y"
+#line 171 "yacc.y"
     {
 				int i = tb.colNum_u64++;
 				column *col = &tb.col[i];
@@ -1659,7 +1665,7 @@ yyreduce:
   case 23:
 
 /* Line 1455 of yacc.c  */
-#line 174 "yacc.y"
+#line 180 "yacc.y"
     {
 			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
@@ -1675,7 +1681,7 @@ yyreduce:
   case 24:
 
 /* Line 1455 of yacc.c  */
-#line 184 "yacc.y"
+#line 190 "yacc.y"
     {
 			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
@@ -1691,7 +1697,7 @@ yyreduce:
   case 25:
 
 /* Line 1455 of yacc.c  */
-#line 194 "yacc.y"
+#line 200 "yacc.y"
     {
 			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
@@ -1707,7 +1713,7 @@ yyreduce:
   case 26:
 
 /* Line 1455 of yacc.c  */
-#line 204 "yacc.y"
+#line 210 "yacc.y"
     {
 			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
@@ -1723,7 +1729,7 @@ yyreduce:
   case 27:
 
 /* Line 1455 of yacc.c  */
-#line 214 "yacc.y"
+#line 220 "yacc.y"
     {
 			 	int i = tb.colNum_u64++;
 			 	column *col = &tb.col[i];
@@ -1739,7 +1745,7 @@ yyreduce:
   case 28:
 
 /* Line 1455 of yacc.c  */
-#line 226 "yacc.y"
+#line 232 "yacc.y"
     {
 				table * tp = miniSQL_connectTable((const char*)(yyvsp[(3) - (8)]));
 				if(tp == NULL) {fprintf(stderr,"Table %s Not Exist!\n",(char*)(yyvsp[(3) - (8)])); return 0;}
@@ -1765,11 +1771,12 @@ yyreduce:
   case 29:
 
 /* Line 1455 of yacc.c  */
-#line 248 "yacc.y"
+#line 254 "yacc.y"
     {
 					item i;
 					i.type = CHAR;
-					i.data.str = (char*)(yyvsp[(1) - (1)]);
+					i.data.str = new char[256];
+					strcpy(i.data.str,(char*)(yyvsp[(1) - (1)]));
 					rcd.i.push_back(i);
 					;}
     break;
@@ -1777,7 +1784,7 @@ yyreduce:
   case 30:
 
 /* Line 1455 of yacc.c  */
-#line 254 "yacc.y"
+#line 261 "yacc.y"
     {
 			 		item i;
 			 		i.type = INT;
@@ -1789,7 +1796,7 @@ yyreduce:
   case 31:
 
 /* Line 1455 of yacc.c  */
-#line 260 "yacc.y"
+#line 267 "yacc.y"
     {
 			 		item i;
 			 		i.type = FLOAT;
@@ -1801,49 +1808,49 @@ yyreduce:
   case 34:
 
 /* Line 1455 of yacc.c  */
-#line 272 "yacc.y"
+#line 279 "yacc.y"
     {cmp = LE;;}
     break;
 
   case 35:
 
 /* Line 1455 of yacc.c  */
-#line 273 "yacc.y"
+#line 280 "yacc.y"
     {cmp = LT;;}
     break;
 
   case 36:
 
 /* Line 1455 of yacc.c  */
-#line 274 "yacc.y"
+#line 281 "yacc.y"
     {cmp = EQ;;}
     break;
 
   case 37:
 
 /* Line 1455 of yacc.c  */
-#line 275 "yacc.y"
+#line 282 "yacc.y"
     {cmp = NE;;}
     break;
 
   case 38:
 
 /* Line 1455 of yacc.c  */
-#line 276 "yacc.y"
+#line 283 "yacc.y"
     {cmp = GE;;}
     break;
 
   case 39:
 
 /* Line 1455 of yacc.c  */
-#line 277 "yacc.y"
+#line 284 "yacc.y"
     {cmp = GT;;}
     break;
 
   case 40:
 
 /* Line 1455 of yacc.c  */
-#line 280 "yacc.y"
+#line 287 "yacc.y"
     {
 				table *tb;
 				if((tb = miniSQL_connectTable((char*)(yyvsp[(4) - (6)]))) == NULL){
@@ -1884,7 +1891,7 @@ yyreduce:
   case 41:
 
 /* Line 1455 of yacc.c  */
-#line 315 "yacc.y"
+#line 322 "yacc.y"
     {
 			 	table *tb;
 				if((tb = miniSQL_connectTable((char*)(yyvsp[(4) - (4)]))) == NULL){
@@ -1901,7 +1908,7 @@ yyreduce:
   case 42:
 
 /* Line 1455 of yacc.c  */
-#line 328 "yacc.y"
+#line 335 "yacc.y"
     {
 				table *tb;
 				puts("drop table");
@@ -1916,7 +1923,7 @@ yyreduce:
   case 43:
 
 /* Line 1455 of yacc.c  */
-#line 337 "yacc.y"
+#line 344 "yacc.y"
     {
 				miniSQL_dropIndex((char*)(yyvsp[(3) - (4)]));
 			 ;}
@@ -1925,7 +1932,7 @@ yyreduce:
 
 
 /* Line 1455 of yacc.c  */
-#line 1929 "ra.tab.c"
+#line 1936 "ra.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2137,6 +2144,6 @@ yyreturn:
 
 
 /* Line 1675 of yacc.c  */
-#line 341 "yacc.y"
+#line 348 "yacc.y"
 
 
