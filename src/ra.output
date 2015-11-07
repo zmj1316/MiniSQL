@@ -1,9 +1,9 @@
 Terminals unused in grammar
 
-   EXEC
    LS
    RS
    NEWLINE
+   FNAME
 
 
 Grammar
@@ -21,131 +21,133 @@ Grammar
     7          | DELETE_S
     8          | INSERT_S
     9          | QUIT
+   10          | EXEC NAME
 
-   10 SELECT_S: SELECT STAR FROM NAME WHERE TJS TM
-   11         | SELECT STAR FROM NAME TM
+   11 SELECT_S: SELECT STAR FROM NAME WHERE TJS TM
+   12         | SELECT STAR FROM NAME TM
 
-   12 TJS: TJ
-   13    | TJS AND TJ
+   13 TJS: TJ
+   14    | TJS AND TJ
 
-   14 TJ: NAME FL INTEGER
-   15   | NAME FL FF
-   16   | NAME FL STRING
+   15 TJ: NAME FL INTEGER
+   16   | NAME FL FF
+   17   | NAME FL STRING
 
-   17 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM
-   18         | CREATE INDEX NAME ON NAME CC NAME CC TM
+   18 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM
+   19         | CREATE INDEX NAME ON NAME CC NAME CC TM
 
-   19 ATTRS: ATTR
-   20      | ATTRS DD ATTR
+   20 ATTRS: ATTR
+   21      | ATTRS DD ATTR
 
-   21 ATTR: NAME tCHAR CC INTEGER CC
-   22     | NAME tCHAR CC INTEGER CC UNI
-   23     | NAME tINT
-   24     | NAME tINT UNI
-   25     | NAME tFLOAT
-   26     | NAME tFLOAT UNI
+   22 ATTR: NAME tCHAR CC INTEGER CC
+   23     | NAME tCHAR CC INTEGER CC UNI
+   24     | NAME tINT
+   25     | NAME tINT UNI
+   26     | NAME tFLOAT
+   27     | NAME tFLOAT UNI
 
-   27 INSERT_S: INSERT INTO NAME VALUES CC VALUESS CC TM
+   28 INSERT_S: INSERT INTO NAME VALUES CC VALUESS CC TM
 
-   28 VALUE: STRING
-   29      | INTEGER
-   30      | FF
+   29 VALUE: STRING
+   30      | INTEGER
+   31      | FF
 
-   31 VALUESS: VALUE
-   32        | VALUESS DD VALUE
+   32 VALUESS: VALUE
+   33        | VALUESS DD VALUE
 
-   33 FL: mLE
-   34   | mLT
-   35   | mEQ
-   36   | mNE
-   37   | mGE
-   38   | mGT
+   34 FL: mLE
+   35   | mLT
+   36   | mEQ
+   37   | mNE
+   38   | mGE
+   39   | mGT
 
-   39 DELETE_S: DELETE FROM NAME WHERE TJS TM
-   40         | DELETE FROM NAME TM
+   40 DELETE_S: DELETE FROM NAME WHERE TJS TM
+   41         | DELETE FROM NAME TM
 
-   41 DROP_S: DROP TABLE NAME TM
-   42       | DROP INDEX NAME TM
+   42 DROP_S: DROP TABLE NAME TM
+   43       | DROP INDEX NAME TM
 
 
 Terminals, with rules where they appear
 
 $end (0) 0
 error (256)
-STRING (258) 16 28
-CREATE (259) 17 18
-DROP (260) 41 42
-SELECT (261) 10 11
-INSERT (262) 27
-DELETE (263) 39 40
+STRING (258) 17 29
+CREATE (259) 18 19
+DROP (260) 42 43
+SELECT (261) 11 12
+INSERT (262) 28
+DELETE (263) 40 41
 QUIT (264) 9
-EXEC (265)
-TABLE (266) 17 41
-FROM (267) 10 11 39 40
-INTO (268) 27
-mLT (269) 34
-mLE (270) 33
-mEQ (271) 35
-mGT (272) 38
-mGE (273) 37
-mNE (274) 36
-STAR (275) 10 11
-tCHAR (276) 21 22
-tFLOAT (277) 25 26
-tINT (278) 23 24
-NAME (279) 10 11 14 15 16 17 18 21 22 23 24 25 26 27 39 40 41 42
-INTEGER (280) 14 21 22 29
-FF (281) 15 30
+EXEC (265) 10
+TABLE (266) 18 42
+FROM (267) 11 12 40 41
+INTO (268) 28
+mLT (269) 35
+mLE (270) 34
+mEQ (271) 36
+mGT (272) 39
+mGE (273) 38
+mNE (274) 37
+STAR (275) 11 12
+tCHAR (276) 22 23
+tFLOAT (277) 26 27
+tINT (278) 24 25
+NAME (279) 10 11 12 15 16 17 18 19 22 23 24 25 26 27 28 40 41 42 43
+INTEGER (280) 15 22 23 30
+FF (281) 16 31
 LS (282)
 RS (283)
-TM (284) 10 11 17 18 27 39 40 41 42
-WHERE (285) 10 39
-DD (286) 17 20 32
+TM (284) 11 12 18 19 28 40 41 42 43
+WHERE (285) 11 40
+DD (286) 18 21 33
 NEWLINE (287)
-VALUES (288) 27
-CC (289) 17 18 21 22 27
-UNI (290) 22 24 26
-PRIM (291) 17
-KEY (292) 17
-INDEX (293) 18 42
-ON (294) 18
-AND (295) 13
+VALUES (288) 28
+CC (289) 18 19 22 23 28
+UNI (290) 23 25 27
+PRIM (291) 18
+KEY (292) 18
+INDEX (293) 19 43
+ON (294) 19
+AND (295) 14
+FNAME (296)
 
 
 Nonterminals, with rules where they appear
 
-$accept (41)
+$accept (42)
     on left: 0
-program (42)
+program (43)
     on left: 1, on right: 0
-statements (43)
+statements (44)
     on left: 2 3, on right: 1 3
-statement (44)
-    on left: 4 5 6 7 8 9, on right: 2 3
-SELECT_S (45)
-    on left: 10 11, on right: 4
-TJS (46)
-    on left: 12 13, on right: 10 13 39
-TJ (47)
-    on left: 14 15 16, on right: 12 13
-CREATE_S (48)
-    on left: 17 18, on right: 5
-ATTRS (49)
-    on left: 19 20, on right: 17 20
-ATTR (50)
-    on left: 21 22 23 24 25 26, on right: 19 20
-INSERT_S (51)
-    on left: 27, on right: 8
-VALUE (52)
-    on left: 28 29 30, on right: 31 32
-VALUESS (53)
-    on left: 31 32, on right: 27 32
-FL (54)
-    on left: 33 34 35 36 37 38, on right: 14 15 16
-DELETE_S (55)
-    on left: 39 40, on right: 7
-DROP_S (56)
-    on left: 41 42, on right: 6
+statement (45)
+    on left: 4 5 6 7 8 9 10, on right: 2 3
+SELECT_S (46)
+    on left: 11 12, on right: 4
+TJS (47)
+    on left: 13 14, on right: 11 14 40
+TJ (48)
+    on left: 15 16 17, on right: 13 14
+CREATE_S (49)
+    on left: 18 19, on right: 5
+ATTRS (50)
+    on left: 20 21, on right: 18 21
+ATTR (51)
+    on left: 22 23 24 25 26 27, on right: 20 21
+INSERT_S (52)
+    on left: 28, on right: 8
+VALUE (53)
+    on left: 29 30 31, on right: 32 33
+VALUESS (54)
+    on left: 32 33, on right: 28 33
+FL (55)
+    on left: 34 35 36 37 38 39, on right: 15 16 17
+DELETE_S (56)
+    on left: 40 41, on right: 7
+DROP_S (57)
+    on left: 42 43, on right: 6
 
 
 state 0
@@ -158,56 +160,57 @@ state 0
     INSERT  shift, and go to state 4
     DELETE  shift, and go to state 5
     QUIT    shift, and go to state 6
+    EXEC    shift, and go to state 7
 
-    program     go to state 7
-    statements  go to state 8
-    statement   go to state 9
-    SELECT_S    go to state 10
-    CREATE_S    go to state 11
-    INSERT_S    go to state 12
-    DELETE_S    go to state 13
-    DROP_S      go to state 14
+    program     go to state 8
+    statements  go to state 9
+    statement   go to state 10
+    SELECT_S    go to state 11
+    CREATE_S    go to state 12
+    INSERT_S    go to state 13
+    DELETE_S    go to state 14
+    DROP_S      go to state 15
 
 
 state 1
 
-   17 CREATE_S: CREATE . TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM
-   18         | CREATE . INDEX NAME ON NAME CC NAME CC TM
+   18 CREATE_S: CREATE . TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM
+   19         | CREATE . INDEX NAME ON NAME CC NAME CC TM
 
-    TABLE  shift, and go to state 15
-    INDEX  shift, and go to state 16
+    TABLE  shift, and go to state 16
+    INDEX  shift, and go to state 17
 
 
 state 2
 
-   41 DROP_S: DROP . TABLE NAME TM
-   42       | DROP . INDEX NAME TM
+   42 DROP_S: DROP . TABLE NAME TM
+   43       | DROP . INDEX NAME TM
 
-    TABLE  shift, and go to state 17
-    INDEX  shift, and go to state 18
+    TABLE  shift, and go to state 18
+    INDEX  shift, and go to state 19
 
 
 state 3
 
-   10 SELECT_S: SELECT . STAR FROM NAME WHERE TJS TM
-   11         | SELECT . STAR FROM NAME TM
+   11 SELECT_S: SELECT . STAR FROM NAME WHERE TJS TM
+   12         | SELECT . STAR FROM NAME TM
 
-    STAR  shift, and go to state 19
+    STAR  shift, and go to state 20
 
 
 state 4
 
-   27 INSERT_S: INSERT . INTO NAME VALUES CC VALUESS CC TM
+   28 INSERT_S: INSERT . INTO NAME VALUES CC VALUESS CC TM
 
-    INTO  shift, and go to state 20
+    INTO  shift, and go to state 21
 
 
 state 5
 
-   39 DELETE_S: DELETE . FROM NAME WHERE TJS TM
-   40         | DELETE . FROM NAME TM
+   40 DELETE_S: DELETE . FROM NAME WHERE TJS TM
+   41         | DELETE . FROM NAME TM
 
-    FROM  shift, and go to state 21
+    FROM  shift, and go to state 22
 
 
 state 6
@@ -219,12 +222,19 @@ state 6
 
 state 7
 
-    0 $accept: program . $end
+   10 statement: EXEC . NAME
 
-    $end  shift, and go to state 22
+    NAME  shift, and go to state 23
 
 
 state 8
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 24
+
+
+state 9
 
     1 program: statements .
     3 statements: statements . statement
@@ -235,684 +245,692 @@ state 8
     INSERT  shift, and go to state 4
     DELETE  shift, and go to state 5
     QUIT    shift, and go to state 6
+    EXEC    shift, and go to state 7
 
     $default  reduce using rule 1 (program)
 
-    statement  go to state 23
-    SELECT_S   go to state 10
-    CREATE_S   go to state 11
-    INSERT_S   go to state 12
-    DELETE_S   go to state 13
-    DROP_S     go to state 14
+    statement  go to state 25
+    SELECT_S   go to state 11
+    CREATE_S   go to state 12
+    INSERT_S   go to state 13
+    DELETE_S   go to state 14
+    DROP_S     go to state 15
 
 
-state 9
+state 10
 
     2 statements: statement .
 
     $default  reduce using rule 2 (statements)
 
 
-state 10
+state 11
 
     4 statement: SELECT_S .
 
     $default  reduce using rule 4 (statement)
 
 
-state 11
+state 12
 
     5 statement: CREATE_S .
 
     $default  reduce using rule 5 (statement)
 
 
-state 12
+state 13
 
     8 statement: INSERT_S .
 
     $default  reduce using rule 8 (statement)
 
 
-state 13
+state 14
 
     7 statement: DELETE_S .
 
     $default  reduce using rule 7 (statement)
 
 
-state 14
+state 15
 
     6 statement: DROP_S .
 
     $default  reduce using rule 6 (statement)
 
 
-state 15
-
-   17 CREATE_S: CREATE TABLE . NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM
-
-    NAME  shift, and go to state 24
-
-
 state 16
 
-   18 CREATE_S: CREATE INDEX . NAME ON NAME CC NAME CC TM
-
-    NAME  shift, and go to state 25
-
-
-state 17
-
-   41 DROP_S: DROP TABLE . NAME TM
+   18 CREATE_S: CREATE TABLE . NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM
 
     NAME  shift, and go to state 26
 
 
-state 18
+state 17
 
-   42 DROP_S: DROP INDEX . NAME TM
+   19 CREATE_S: CREATE INDEX . NAME ON NAME CC NAME CC TM
 
     NAME  shift, and go to state 27
 
 
+state 18
+
+   42 DROP_S: DROP TABLE . NAME TM
+
+    NAME  shift, and go to state 28
+
+
 state 19
 
-   10 SELECT_S: SELECT STAR . FROM NAME WHERE TJS TM
-   11         | SELECT STAR . FROM NAME TM
-
-    FROM  shift, and go to state 28
-
-
-state 20
-
-   27 INSERT_S: INSERT INTO . NAME VALUES CC VALUESS CC TM
+   43 DROP_S: DROP INDEX . NAME TM
 
     NAME  shift, and go to state 29
 
 
+state 20
+
+   11 SELECT_S: SELECT STAR . FROM NAME WHERE TJS TM
+   12         | SELECT STAR . FROM NAME TM
+
+    FROM  shift, and go to state 30
+
+
 state 21
 
-   39 DELETE_S: DELETE FROM . NAME WHERE TJS TM
-   40         | DELETE FROM . NAME TM
+   28 INSERT_S: INSERT INTO . NAME VALUES CC VALUESS CC TM
 
-    NAME  shift, and go to state 30
+    NAME  shift, and go to state 31
 
 
 state 22
+
+   40 DELETE_S: DELETE FROM . NAME WHERE TJS TM
+   41         | DELETE FROM . NAME TM
+
+    NAME  shift, and go to state 32
+
+
+state 23
+
+   10 statement: EXEC NAME .
+
+    $default  reduce using rule 10 (statement)
+
+
+state 24
 
     0 $accept: program $end .
 
     $default  accept
 
 
-state 23
+state 25
 
     3 statements: statements statement .
 
     $default  reduce using rule 3 (statements)
 
 
-state 24
-
-   17 CREATE_S: CREATE TABLE NAME . CC ATTRS DD PRIM KEY CC NAME CC CC TM
-
-    CC  shift, and go to state 31
-
-
-state 25
-
-   18 CREATE_S: CREATE INDEX NAME . ON NAME CC NAME CC TM
-
-    ON  shift, and go to state 32
-
-
 state 26
 
-   41 DROP_S: DROP TABLE NAME . TM
+   18 CREATE_S: CREATE TABLE NAME . CC ATTRS DD PRIM KEY CC NAME CC CC TM
 
-    TM  shift, and go to state 33
+    CC  shift, and go to state 33
 
 
 state 27
 
-   42 DROP_S: DROP INDEX NAME . TM
+   19 CREATE_S: CREATE INDEX NAME . ON NAME CC NAME CC TM
 
-    TM  shift, and go to state 34
+    ON  shift, and go to state 34
 
 
 state 28
 
-   10 SELECT_S: SELECT STAR FROM . NAME WHERE TJS TM
-   11         | SELECT STAR FROM . NAME TM
+   42 DROP_S: DROP TABLE NAME . TM
 
-    NAME  shift, and go to state 35
+    TM  shift, and go to state 35
 
 
 state 29
 
-   27 INSERT_S: INSERT INTO NAME . VALUES CC VALUESS CC TM
+   43 DROP_S: DROP INDEX NAME . TM
 
-    VALUES  shift, and go to state 36
+    TM  shift, and go to state 36
 
 
 state 30
 
-   39 DELETE_S: DELETE FROM NAME . WHERE TJS TM
-   40         | DELETE FROM NAME . TM
+   11 SELECT_S: SELECT STAR FROM . NAME WHERE TJS TM
+   12         | SELECT STAR FROM . NAME TM
 
-    TM     shift, and go to state 37
-    WHERE  shift, and go to state 38
+    NAME  shift, and go to state 37
 
 
 state 31
 
-   17 CREATE_S: CREATE TABLE NAME CC . ATTRS DD PRIM KEY CC NAME CC CC TM
+   28 INSERT_S: INSERT INTO NAME . VALUES CC VALUESS CC TM
 
-    NAME  shift, and go to state 39
-
-    ATTRS  go to state 40
-    ATTR   go to state 41
+    VALUES  shift, and go to state 38
 
 
 state 32
 
-   18 CREATE_S: CREATE INDEX NAME ON . NAME CC NAME CC TM
+   40 DELETE_S: DELETE FROM NAME . WHERE TJS TM
+   41         | DELETE FROM NAME . TM
 
-    NAME  shift, and go to state 42
+    TM     shift, and go to state 39
+    WHERE  shift, and go to state 40
 
 
 state 33
 
-   41 DROP_S: DROP TABLE NAME TM .
+   18 CREATE_S: CREATE TABLE NAME CC . ATTRS DD PRIM KEY CC NAME CC CC TM
 
-    $default  reduce using rule 41 (DROP_S)
+    NAME  shift, and go to state 41
+
+    ATTRS  go to state 42
+    ATTR   go to state 43
 
 
 state 34
 
-   42 DROP_S: DROP INDEX NAME TM .
+   19 CREATE_S: CREATE INDEX NAME ON . NAME CC NAME CC TM
 
-    $default  reduce using rule 42 (DROP_S)
+    NAME  shift, and go to state 44
 
 
 state 35
 
-   10 SELECT_S: SELECT STAR FROM NAME . WHERE TJS TM
-   11         | SELECT STAR FROM NAME . TM
+   42 DROP_S: DROP TABLE NAME TM .
 
-    TM     shift, and go to state 43
-    WHERE  shift, and go to state 44
+    $default  reduce using rule 42 (DROP_S)
 
 
 state 36
 
-   27 INSERT_S: INSERT INTO NAME VALUES . CC VALUESS CC TM
+   43 DROP_S: DROP INDEX NAME TM .
 
-    CC  shift, and go to state 45
+    $default  reduce using rule 43 (DROP_S)
 
 
 state 37
 
-   40 DELETE_S: DELETE FROM NAME TM .
+   11 SELECT_S: SELECT STAR FROM NAME . WHERE TJS TM
+   12         | SELECT STAR FROM NAME . TM
 
-    $default  reduce using rule 40 (DELETE_S)
+    TM     shift, and go to state 45
+    WHERE  shift, and go to state 46
 
 
 state 38
 
-   39 DELETE_S: DELETE FROM NAME WHERE . TJS TM
+   28 INSERT_S: INSERT INTO NAME VALUES . CC VALUESS CC TM
 
-    NAME  shift, and go to state 46
-
-    TJS  go to state 47
-    TJ   go to state 48
+    CC  shift, and go to state 47
 
 
 state 39
 
-   21 ATTR: NAME . tCHAR CC INTEGER CC
-   22     | NAME . tCHAR CC INTEGER CC UNI
-   23     | NAME . tINT
-   24     | NAME . tINT UNI
-   25     | NAME . tFLOAT
-   26     | NAME . tFLOAT UNI
+   41 DELETE_S: DELETE FROM NAME TM .
 
-    tCHAR   shift, and go to state 49
-    tFLOAT  shift, and go to state 50
-    tINT    shift, and go to state 51
+    $default  reduce using rule 41 (DELETE_S)
 
 
 state 40
 
-   17 CREATE_S: CREATE TABLE NAME CC ATTRS . DD PRIM KEY CC NAME CC CC TM
-   20 ATTRS: ATTRS . DD ATTR
+   40 DELETE_S: DELETE FROM NAME WHERE . TJS TM
 
-    DD  shift, and go to state 52
+    NAME  shift, and go to state 48
+
+    TJS  go to state 49
+    TJ   go to state 50
 
 
 state 41
 
-   19 ATTRS: ATTR .
+   22 ATTR: NAME . tCHAR CC INTEGER CC
+   23     | NAME . tCHAR CC INTEGER CC UNI
+   24     | NAME . tINT
+   25     | NAME . tINT UNI
+   26     | NAME . tFLOAT
+   27     | NAME . tFLOAT UNI
 
-    $default  reduce using rule 19 (ATTRS)
+    tCHAR   shift, and go to state 51
+    tFLOAT  shift, and go to state 52
+    tINT    shift, and go to state 53
 
 
 state 42
 
-   18 CREATE_S: CREATE INDEX NAME ON NAME . CC NAME CC TM
+   18 CREATE_S: CREATE TABLE NAME CC ATTRS . DD PRIM KEY CC NAME CC CC TM
+   21 ATTRS: ATTRS . DD ATTR
 
-    CC  shift, and go to state 53
+    DD  shift, and go to state 54
 
 
 state 43
 
-   11 SELECT_S: SELECT STAR FROM NAME TM .
+   20 ATTRS: ATTR .
 
-    $default  reduce using rule 11 (SELECT_S)
+    $default  reduce using rule 20 (ATTRS)
 
 
 state 44
 
-   10 SELECT_S: SELECT STAR FROM NAME WHERE . TJS TM
+   19 CREATE_S: CREATE INDEX NAME ON NAME . CC NAME CC TM
 
-    NAME  shift, and go to state 46
-
-    TJS  go to state 54
-    TJ   go to state 48
+    CC  shift, and go to state 55
 
 
 state 45
 
-   27 INSERT_S: INSERT INTO NAME VALUES CC . VALUESS CC TM
+   12 SELECT_S: SELECT STAR FROM NAME TM .
 
-    STRING   shift, and go to state 55
-    INTEGER  shift, and go to state 56
-    FF       shift, and go to state 57
-
-    VALUE    go to state 58
-    VALUESS  go to state 59
+    $default  reduce using rule 12 (SELECT_S)
 
 
 state 46
 
-   14 TJ: NAME . FL INTEGER
-   15   | NAME . FL FF
-   16   | NAME . FL STRING
+   11 SELECT_S: SELECT STAR FROM NAME WHERE . TJS TM
 
-    mLT  shift, and go to state 60
-    mLE  shift, and go to state 61
-    mEQ  shift, and go to state 62
-    mGT  shift, and go to state 63
-    mGE  shift, and go to state 64
-    mNE  shift, and go to state 65
+    NAME  shift, and go to state 48
 
-    FL  go to state 66
+    TJS  go to state 56
+    TJ   go to state 50
 
 
 state 47
 
-   13 TJS: TJS . AND TJ
-   39 DELETE_S: DELETE FROM NAME WHERE TJS . TM
+   28 INSERT_S: INSERT INTO NAME VALUES CC . VALUESS CC TM
 
-    TM   shift, and go to state 67
-    AND  shift, and go to state 68
+    STRING   shift, and go to state 57
+    INTEGER  shift, and go to state 58
+    FF       shift, and go to state 59
+
+    VALUE    go to state 60
+    VALUESS  go to state 61
 
 
 state 48
 
-   12 TJS: TJ .
+   15 TJ: NAME . FL INTEGER
+   16   | NAME . FL FF
+   17   | NAME . FL STRING
 
-    $default  reduce using rule 12 (TJS)
+    mLT  shift, and go to state 62
+    mLE  shift, and go to state 63
+    mEQ  shift, and go to state 64
+    mGT  shift, and go to state 65
+    mGE  shift, and go to state 66
+    mNE  shift, and go to state 67
+
+    FL  go to state 68
 
 
 state 49
 
-   21 ATTR: NAME tCHAR . CC INTEGER CC
-   22     | NAME tCHAR . CC INTEGER CC UNI
+   14 TJS: TJS . AND TJ
+   40 DELETE_S: DELETE FROM NAME WHERE TJS . TM
 
-    CC  shift, and go to state 69
+    TM   shift, and go to state 69
+    AND  shift, and go to state 70
 
 
 state 50
 
-   25 ATTR: NAME tFLOAT .
-   26     | NAME tFLOAT . UNI
+   13 TJS: TJ .
 
-    UNI  shift, and go to state 70
-
-    $default  reduce using rule 25 (ATTR)
+    $default  reduce using rule 13 (TJS)
 
 
 state 51
 
-   23 ATTR: NAME tINT .
-   24     | NAME tINT . UNI
+   22 ATTR: NAME tCHAR . CC INTEGER CC
+   23     | NAME tCHAR . CC INTEGER CC UNI
 
-    UNI  shift, and go to state 71
-
-    $default  reduce using rule 23 (ATTR)
+    CC  shift, and go to state 71
 
 
 state 52
 
-   17 CREATE_S: CREATE TABLE NAME CC ATTRS DD . PRIM KEY CC NAME CC CC TM
-   20 ATTRS: ATTRS DD . ATTR
+   26 ATTR: NAME tFLOAT .
+   27     | NAME tFLOAT . UNI
 
-    NAME  shift, and go to state 39
-    PRIM  shift, and go to state 72
+    UNI  shift, and go to state 72
 
-    ATTR  go to state 73
+    $default  reduce using rule 26 (ATTR)
 
 
 state 53
 
-   18 CREATE_S: CREATE INDEX NAME ON NAME CC . NAME CC TM
+   24 ATTR: NAME tINT .
+   25     | NAME tINT . UNI
 
-    NAME  shift, and go to state 74
+    UNI  shift, and go to state 73
+
+    $default  reduce using rule 24 (ATTR)
 
 
 state 54
 
-   10 SELECT_S: SELECT STAR FROM NAME WHERE TJS . TM
-   13 TJS: TJS . AND TJ
+   18 CREATE_S: CREATE TABLE NAME CC ATTRS DD . PRIM KEY CC NAME CC CC TM
+   21 ATTRS: ATTRS DD . ATTR
 
-    TM   shift, and go to state 75
-    AND  shift, and go to state 68
+    NAME  shift, and go to state 41
+    PRIM  shift, and go to state 74
+
+    ATTR  go to state 75
 
 
 state 55
 
-   28 VALUE: STRING .
+   19 CREATE_S: CREATE INDEX NAME ON NAME CC . NAME CC TM
 
-    $default  reduce using rule 28 (VALUE)
+    NAME  shift, and go to state 76
 
 
 state 56
 
-   29 VALUE: INTEGER .
+   11 SELECT_S: SELECT STAR FROM NAME WHERE TJS . TM
+   14 TJS: TJS . AND TJ
 
-    $default  reduce using rule 29 (VALUE)
+    TM   shift, and go to state 77
+    AND  shift, and go to state 70
 
 
 state 57
 
-   30 VALUE: FF .
+   29 VALUE: STRING .
 
-    $default  reduce using rule 30 (VALUE)
+    $default  reduce using rule 29 (VALUE)
 
 
 state 58
 
-   31 VALUESS: VALUE .
+   30 VALUE: INTEGER .
 
-    $default  reduce using rule 31 (VALUESS)
+    $default  reduce using rule 30 (VALUE)
 
 
 state 59
 
-   27 INSERT_S: INSERT INTO NAME VALUES CC VALUESS . CC TM
-   32 VALUESS: VALUESS . DD VALUE
+   31 VALUE: FF .
 
-    DD  shift, and go to state 76
-    CC  shift, and go to state 77
+    $default  reduce using rule 31 (VALUE)
 
 
 state 60
 
-   34 FL: mLT .
+   32 VALUESS: VALUE .
 
-    $default  reduce using rule 34 (FL)
+    $default  reduce using rule 32 (VALUESS)
 
 
 state 61
 
-   33 FL: mLE .
+   28 INSERT_S: INSERT INTO NAME VALUES CC VALUESS . CC TM
+   33 VALUESS: VALUESS . DD VALUE
 
-    $default  reduce using rule 33 (FL)
+    DD  shift, and go to state 78
+    CC  shift, and go to state 79
 
 
 state 62
 
-   35 FL: mEQ .
+   35 FL: mLT .
 
     $default  reduce using rule 35 (FL)
 
 
 state 63
 
-   38 FL: mGT .
+   34 FL: mLE .
 
-    $default  reduce using rule 38 (FL)
+    $default  reduce using rule 34 (FL)
 
 
 state 64
 
-   37 FL: mGE .
-
-    $default  reduce using rule 37 (FL)
-
-
-state 65
-
-   36 FL: mNE .
+   36 FL: mEQ .
 
     $default  reduce using rule 36 (FL)
 
 
+state 65
+
+   39 FL: mGT .
+
+    $default  reduce using rule 39 (FL)
+
+
 state 66
 
-   14 TJ: NAME FL . INTEGER
-   15   | NAME FL . FF
-   16   | NAME FL . STRING
+   38 FL: mGE .
 
-    STRING   shift, and go to state 78
-    INTEGER  shift, and go to state 79
-    FF       shift, and go to state 80
+    $default  reduce using rule 38 (FL)
 
 
 state 67
 
-   39 DELETE_S: DELETE FROM NAME WHERE TJS TM .
+   37 FL: mNE .
 
-    $default  reduce using rule 39 (DELETE_S)
+    $default  reduce using rule 37 (FL)
 
 
 state 68
 
-   13 TJS: TJS AND . TJ
+   15 TJ: NAME FL . INTEGER
+   16   | NAME FL . FF
+   17   | NAME FL . STRING
 
-    NAME  shift, and go to state 46
-
-    TJ  go to state 81
+    STRING   shift, and go to state 80
+    INTEGER  shift, and go to state 81
+    FF       shift, and go to state 82
 
 
 state 69
 
-   21 ATTR: NAME tCHAR CC . INTEGER CC
-   22     | NAME tCHAR CC . INTEGER CC UNI
+   40 DELETE_S: DELETE FROM NAME WHERE TJS TM .
 
-    INTEGER  shift, and go to state 82
+    $default  reduce using rule 40 (DELETE_S)
 
 
 state 70
 
-   26 ATTR: NAME tFLOAT UNI .
+   14 TJS: TJS AND . TJ
 
-    $default  reduce using rule 26 (ATTR)
+    NAME  shift, and go to state 48
+
+    TJ  go to state 83
 
 
 state 71
 
-   24 ATTR: NAME tINT UNI .
+   22 ATTR: NAME tCHAR CC . INTEGER CC
+   23     | NAME tCHAR CC . INTEGER CC UNI
 
-    $default  reduce using rule 24 (ATTR)
+    INTEGER  shift, and go to state 84
 
 
 state 72
 
-   17 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM . KEY CC NAME CC CC TM
+   27 ATTR: NAME tFLOAT UNI .
 
-    KEY  shift, and go to state 83
+    $default  reduce using rule 27 (ATTR)
 
 
 state 73
 
-   20 ATTRS: ATTRS DD ATTR .
+   25 ATTR: NAME tINT UNI .
 
-    $default  reduce using rule 20 (ATTRS)
+    $default  reduce using rule 25 (ATTR)
 
 
 state 74
 
-   18 CREATE_S: CREATE INDEX NAME ON NAME CC NAME . CC TM
+   18 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM . KEY CC NAME CC CC TM
 
-    CC  shift, and go to state 84
+    KEY  shift, and go to state 85
 
 
 state 75
 
-   10 SELECT_S: SELECT STAR FROM NAME WHERE TJS TM .
+   21 ATTRS: ATTRS DD ATTR .
 
-    $default  reduce using rule 10 (SELECT_S)
+    $default  reduce using rule 21 (ATTRS)
 
 
 state 76
 
-   32 VALUESS: VALUESS DD . VALUE
+   19 CREATE_S: CREATE INDEX NAME ON NAME CC NAME . CC TM
 
-    STRING   shift, and go to state 55
-    INTEGER  shift, and go to state 56
-    FF       shift, and go to state 57
-
-    VALUE  go to state 85
+    CC  shift, and go to state 86
 
 
 state 77
 
-   27 INSERT_S: INSERT INTO NAME VALUES CC VALUESS CC . TM
+   11 SELECT_S: SELECT STAR FROM NAME WHERE TJS TM .
 
-    TM  shift, and go to state 86
+    $default  reduce using rule 11 (SELECT_S)
 
 
 state 78
 
-   16 TJ: NAME FL STRING .
+   33 VALUESS: VALUESS DD . VALUE
 
-    $default  reduce using rule 16 (TJ)
+    STRING   shift, and go to state 57
+    INTEGER  shift, and go to state 58
+    FF       shift, and go to state 59
+
+    VALUE  go to state 87
 
 
 state 79
 
-   14 TJ: NAME FL INTEGER .
+   28 INSERT_S: INSERT INTO NAME VALUES CC VALUESS CC . TM
 
-    $default  reduce using rule 14 (TJ)
+    TM  shift, and go to state 88
 
 
 state 80
 
-   15 TJ: NAME FL FF .
+   17 TJ: NAME FL STRING .
 
-    $default  reduce using rule 15 (TJ)
+    $default  reduce using rule 17 (TJ)
 
 
 state 81
 
-   13 TJS: TJS AND TJ .
+   15 TJ: NAME FL INTEGER .
 
-    $default  reduce using rule 13 (TJS)
+    $default  reduce using rule 15 (TJ)
 
 
 state 82
 
-   21 ATTR: NAME tCHAR CC INTEGER . CC
-   22     | NAME tCHAR CC INTEGER . CC UNI
+   16 TJ: NAME FL FF .
 
-    CC  shift, and go to state 87
+    $default  reduce using rule 16 (TJ)
 
 
 state 83
 
-   17 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY . CC NAME CC CC TM
+   14 TJS: TJS AND TJ .
 
-    CC  shift, and go to state 88
+    $default  reduce using rule 14 (TJS)
 
 
 state 84
 
-   18 CREATE_S: CREATE INDEX NAME ON NAME CC NAME CC . TM
+   22 ATTR: NAME tCHAR CC INTEGER . CC
+   23     | NAME tCHAR CC INTEGER . CC UNI
 
-    TM  shift, and go to state 89
+    CC  shift, and go to state 89
 
 
 state 85
 
-   32 VALUESS: VALUESS DD VALUE .
+   18 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY . CC NAME CC CC TM
 
-    $default  reduce using rule 32 (VALUESS)
+    CC  shift, and go to state 90
 
 
 state 86
 
-   27 INSERT_S: INSERT INTO NAME VALUES CC VALUESS CC TM .
+   19 CREATE_S: CREATE INDEX NAME ON NAME CC NAME CC . TM
 
-    $default  reduce using rule 27 (INSERT_S)
+    TM  shift, and go to state 91
 
 
 state 87
 
-   21 ATTR: NAME tCHAR CC INTEGER CC .
-   22     | NAME tCHAR CC INTEGER CC . UNI
+   33 VALUESS: VALUESS DD VALUE .
 
-    UNI  shift, and go to state 90
-
-    $default  reduce using rule 21 (ATTR)
+    $default  reduce using rule 33 (VALUESS)
 
 
 state 88
 
-   17 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC . NAME CC CC TM
+   28 INSERT_S: INSERT INTO NAME VALUES CC VALUESS CC TM .
 
-    NAME  shift, and go to state 91
+    $default  reduce using rule 28 (INSERT_S)
 
 
 state 89
 
-   18 CREATE_S: CREATE INDEX NAME ON NAME CC NAME CC TM .
+   22 ATTR: NAME tCHAR CC INTEGER CC .
+   23     | NAME tCHAR CC INTEGER CC . UNI
 
-    $default  reduce using rule 18 (CREATE_S)
-
-
-state 90
-
-   22 ATTR: NAME tCHAR CC INTEGER CC UNI .
+    UNI  shift, and go to state 92
 
     $default  reduce using rule 22 (ATTR)
 
 
+state 90
+
+   18 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC . NAME CC CC TM
+
+    NAME  shift, and go to state 93
+
+
 state 91
 
-   17 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME . CC CC TM
+   19 CREATE_S: CREATE INDEX NAME ON NAME CC NAME CC TM .
 
-    CC  shift, and go to state 92
+    $default  reduce using rule 19 (CREATE_S)
 
 
 state 92
 
-   17 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC . CC TM
+   23 ATTR: NAME tCHAR CC INTEGER CC UNI .
 
-    CC  shift, and go to state 93
+    $default  reduce using rule 23 (ATTR)
 
 
 state 93
 
-   17 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC . TM
+   18 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME . CC CC TM
 
-    TM  shift, and go to state 94
+    CC  shift, and go to state 94
 
 
 state 94
 
-   17 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM .
+   18 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC . CC TM
 
-    $default  reduce using rule 17 (CREATE_S)
+    CC  shift, and go to state 95
+
+
+state 95
+
+   18 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC . TM
+
+    TM  shift, and go to state 96
+
+
+state 96
+
+   18 CREATE_S: CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM .
+
+    $default  reduce using rule 18 (CREATE_S)

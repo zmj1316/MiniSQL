@@ -1050,7 +1050,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 79 "lex.l"
+#line 80 "lex.l"
 {
   yylval = _strdup(yytext);
   //puts((char*)yylval);
@@ -1059,13 +1059,13 @@ YY_RULE_SETUP
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 85 "lex.l"
+#line 88 "lex.l"
 {return CC;}
 	YY_BREAK
 case 38:
 /* rule 38 can match eol */
 YY_RULE_SETUP
-#line 87 "lex.l"
+#line 90 "lex.l"
 {
   char *tmp =  _strdup(yytext);
   tmp[strlen(tmp) - 1]=0;
@@ -1076,7 +1076,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 95 "lex.l"
+#line 98 "lex.l"
 {
   // found an float
   float * f = (float*)malloc(sizeof(float));
@@ -1087,7 +1087,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 103 "lex.l"
+#line 106 "lex.l"
 {
   // found an integer
   long *f = (long*)malloc(sizeof(long));
@@ -1098,18 +1098,17 @@ YY_RULE_SETUP
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 113 "lex.l"
+#line 115 "lex.l"
 {
-  cerr << "invalid character; line " << yylineno << endl;
-  exit(10);
+  cerr << "invalid character; line " << yylineno << _strdup(yytext) << endl;
 }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 117 "lex.l"
+#line 118 "lex.l"
 ECHO;
 	YY_BREAK
-#line 1113 "lex.yy.c"
+#line 1112 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(string):
 	yyterminate();
@@ -2079,7 +2078,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 117 "lex.l"
+#line 118 "lex.l"
 
 
 

@@ -76,11 +76,14 @@ ws       [ \t]+
 
 "index"     {return INDEX;}
 "on"        {return ON;}
+
 {id} {
   yylval = _strdup(yytext);
   //puts((char*)yylval);
   return NAME;
 }
+
+
 
 [()] {return CC;}
 
@@ -109,9 +112,7 @@ ws       [ \t]+
 }
 
 
-
 . {
-  cerr << "invalid character; line " << yylineno << endl;
-  exit(10);
+  cerr << "invalid character; line " << yylineno << _strdup(yytext) << endl;
 }
 %%

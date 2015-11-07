@@ -9,7 +9,7 @@ btree.o: global.h btree.h btree.cc buffer.h buffer.o
 buffer.o: global.h buffer.h buffer.cc
 	$(CC) -c buffer.cc
 record.o: global.h buffer.h buffer.o recordmanager.h recordmanager.cpp
-	$(CC) -c Recordmanager.cpp -o record.o
+	$(CC) -c recordmanager.cpp -o record.o
 MiniSQL.o: global.h MiniSQL.h MiniSQL.cc buffer.o btree.o record.o catalog.o
 	$(CC) -c MiniSQL.cc 
 lex.yy.o: lex.yy.c ra.tab.h

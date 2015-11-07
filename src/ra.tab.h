@@ -76,7 +76,8 @@
      KEY = 292,
      INDEX = 293,
      ON = 294,
-     AND = 295
+     AND = 295,
+     FNAME = 296
    };
 #endif
 

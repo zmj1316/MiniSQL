@@ -1,11 +1,13 @@
 %{
 #define YYSTYPE void*
+#include <stdio.h>
 #include <iostream>
 #include <stdio.h>
 using namespace std;
 #include <inttypes.h>
 #include <string.h>
 #include <memory.h>
+#include <fcntl.h>
 #include "MiniSQL.h"
 typedef int8_t flex_int8_t;
 typedef uint8_t flex_uint8_t;
@@ -28,13 +30,14 @@ typedef struct{
 } TData;
 vector<TData> Tdatas;
 Compare cmp;
+extern FILE *yyin;
 %}
 %token STRING 
 %token CREATE DROP SELECT INSERT DELETE QUIT EXEC
 %token TABLE FROM INTO mLT mLE mEQ mGT mGE mNE STAR
 %token tCHAR tFLOAT tINT 
 %token NAME INTEGER FF LS RS TM WHERE DD NEWLINE
-%token VALUES CC UNI PRIM KEY INDEX ON AND
+%token VALUES CC UNI PRIM KEY INDEX ON AND FNAME
 %%
 program      : statements 
 			 ;
@@ -49,6 +52,14 @@ statement 	:  SELECT_S		{printf("select done\n");}
 			|  DELETE_S		{printf("delete done\n");}
 			|  INSERT_S     {printf("insert done\n");}
 			|  QUIT			{exit(0);}
+			|  EXEC NAME    {
+							close(0);
+							fprintf(stdout,"Opening %s\n",(char*)$2);
+    						if ( freopen((char*)$2, "r", stdin) == NULL ){
+    						    fprintf(stderr,"Could not open %s\n",(char*)$2);
+    						    return 1;
+    						}
+					}
 			;
 
 SELECT_S 	 : SELECT  STAR FROM NAME WHERE TJS  TM {
@@ -143,9 +154,13 @@ CREATE_S 	 : CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM {
 					{
 						tb.primarykey_u8 = i;
 						tb.col[i].unique_u8 = 1;
-						miniSQL_createTable(&tb);
+						if(!miniSQL_createTable(&tb)){
+							fprintf(stderr,"create failed.\n");
+							goto CCE;
+						}
 						table *tp = miniSQL_connectTable((char*)$3);
 						if(tp == NULL) {fprintf(stderr,"Create failed!\n");return 0;}
+						
 						miniSQL_createIndex(tp,(char*)$10,(char*)$10);
 						miniSQL_disconnectTable(tp);
 						tb.colNum_u64=0;
@@ -156,6 +171,7 @@ CREATE_S 	 : CREATE TABLE NAME CC ATTRS DD PRIM KEY CC NAME CC CC TM {
 					fprintf(stderr, "Primary Key %s not Exist!\n", (char*)$10);
 					tb.colNum_u64=0;
 				}
+				CCE:
 				tb.name_str[0]=0;
 				tb.colNum_u64=0;
 				tb.recordSize = 0;

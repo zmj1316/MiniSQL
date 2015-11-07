@@ -13,6 +13,7 @@ bool miniSQL_createTable(table* tb)
     strcat(filename, ".cat");
     if (_access(filename, 0) == 0)// exist
     {
+        fprintf(stderr, "Table already exists!\n");
         return false;
     }
     catalog_createTable(tb);
