@@ -32,6 +32,6 @@
 *.dSYM/
 
 #database
-./src/*.idx
-./src/*.cat
-./src/*.db
+*.idx
+*.cat
+*.db

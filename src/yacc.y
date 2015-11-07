@@ -58,7 +58,8 @@ SELECT_S 	 : SELECT  STAR FROM NAME WHERE TJS  TM {
 				}
 				Rule rule;
 				for (vector<TData>::iterator i = Tdatas.begin();i!=Tdatas.end();++i){
-					for(int i0 = 0; i0 < tb->colNum_u64;++i0){
+					int i0;
+					for(i0 = 0; i0 < tb->colNum_u64;++i0){
 						if(0==strcmp((*i).name,tb->col[i0].name_str)){
 							if((*i).i.type==tb->col[i0].type){
 								rule.colNo = i0;
@@ -77,6 +78,10 @@ SELECT_S 	 : SELECT  STAR FROM NAME WHERE TJS  TM {
 								goto SSE;
 							}
 						}
+					}
+					if(i0 == tb->colNum_u64){
+						fprintf(stderr,"No column matching filter %s!\n",(*i).name);
+						goto SSE;
 					}
 					filter.rules.push_back(rule);
 				}
