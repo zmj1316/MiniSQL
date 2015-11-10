@@ -3,7 +3,7 @@
  *
  */
 #include "MiniSQL.h"
-int main2()
+int main()
 {
     table *tb = miniSQL_connectTable("orders");
     record r;
@@ -41,7 +41,7 @@ int main2()
     return 0;
 }
 
-int main()
+int main2()
 {
     table *tb = miniSQL_connectTable("teacher");
     //tb->recordNum = 200000;

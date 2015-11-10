@@ -591,48 +591,6 @@ void insertNonleaf(btree* bt, node* nd, u32 parent)
         freeNode(bt, &p);
     }
 }
-/********************/
-/* test functions   */
-void travel(const char * str)
-{
-    static btree bt;
-    getBtree(&bt, str);
-    u32 cur = bt.head;
-    FILE *fp;
-    fp = fopen("out.txt", "a");
-    node nd;
-    while (cur != NONEXT)
-    {
-        getNode(&bt, &nd, cur);
-        for (size_t i = 0; i < nd.N; i++)
-        {
-            fprintf(fp, "%s\n", nd.datas[i].str);
-            //fputs(n.datas[i].str, fp);
-        }
-        fprintf(fp, "***********\n");
-        cur = nd.next;
-    }
-    fprintf(fp, "========================================\n");
-    fclose(fp);
-    freeNode(&bt, &nd);
-}
-void travel2(const char* str)
-{
-    static btree bt;
-    getBtree(&bt, str);
-    u32 cur = bt.root;
-    FILE *fp;
-    fp = fopen("out.txt", "a");
-    while (true)
-    {
-        node nd;
-        getNode(&bt, &nd, cur);
-        for (size_t i = 0; i < nd.N; i++)
-        {
-            
-        }
-    }
-}
 
 void deleteData(btree* bt, node* nd, u32 index)
 {

@@ -176,6 +176,7 @@ void printVrecord(vector<record> r)
     {
         printRecord((*it));
     }
+    fprintf(stdout, "%d selected.\n", r.size());
 }
 
 u8 Rule_cmp(dataType type, Data* s, Data* dst, Rule* rule)

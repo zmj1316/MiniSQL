@@ -70,7 +70,6 @@ bool catalog_dropTable(         // delete the catalog file
     table *tb
     )
 {
-    FILE *fp;
     
     char filename[260];
     strcpy(filename,tb->name_str);

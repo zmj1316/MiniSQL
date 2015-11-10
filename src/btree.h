@@ -113,6 +113,5 @@ static void deleteData(btree*, node *nd, u32 index);
 static void deleteNonleaf(btree*,Data*, u32 parent);
 static void refreshBlock(btree*);
 static void refreshParents(btree* bt,Data *data,u32 parent,u32 offset);
-void travel(const char *);
-void travel2(const char*);
+
 #endif // _BTREE_H
