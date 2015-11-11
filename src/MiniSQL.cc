@@ -11,7 +11,7 @@ bool miniSQL_createTable(table* tb)
     char filename[259];
     strcpy(filename, tb->name_str);
     strcat(filename, ".cat");
-    if (_access(filename, 0) == 0)// exist
+    if (_access(filename, 0) == 0)      // exist
     {
         fprintf(stderr, "Table already exists!\n");
         return false;
@@ -48,7 +48,7 @@ bool miniSQL_dropTable(table* tb)
     fprintf(stdout, "droping table %s\n", tb->name_str);
     for (size_t i = 0; i < tb->colNum_u64; i++)
     {
-        if (tb->col[i].idxname[0]!=0)// index exists
+        if (tb->col[i].idxname[0]!=0)       // index exists
         {
             miniSQL_dropIndex(tb->col[i].idxname);
         }
@@ -148,8 +148,6 @@ void miniSQL_disconnectTable(table* tb)
 
 void printRecord(record r)
 {
-    //FILE *fp;
-    //fp = fopen("Recordoutput.txt", "w");
     for (vector<item>::iterator it = r.i.begin(); it < r.i.end(); ++it)
     {
         item i = *it;

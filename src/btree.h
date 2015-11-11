@@ -107,11 +107,12 @@ static void datacpy(btree* bt, Data *dst, Data *source);    // copy data
 
 // insert data into node by index
 static void insertData(btree*,node *nd, u32 index, Data* target, u32 value);
+// insert node into nonleaf node
 static void insertNonleaf(btree*, node*, u32 parent);
 
-static void deleteData(btree*, node *nd, u32 index);
-static void deleteNonleaf(btree*,Data*, u32 parent);
-static void refreshBlock(btree*);
-static void refreshParents(btree* bt,Data *data,u32 parent,u32 offset);
+static void deleteData(btree*, node *nd, u32 index);        // delete data in node
+static void deleteNonleaf(btree*,Data*, u32 parent);        // delete node in nonleaf
+static void refreshBlock(btree*);                           // refresh the linked list to remove empty leaf nodes
+static void refreshParents(btree* bt,Data *data,u32 parent,u32 offset); // refresh keys in parent nodes after change 
 
 #endif // _BTREE_H

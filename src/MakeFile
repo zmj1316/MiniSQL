@@ -1,6 +1,6 @@
 CC = g++ -O0
-ss: lex.yy.o ra.tab.o test.cpp MiniSQL.o
-	g++  lex.yy.o ra.tab.o MiniSQL.o catalog.o btree.o buffer.o record.o test.cpp 
+ss: lex.yy.o ra.tab.o interpreter.cpp MiniSQL.o
+	g++  lex.yy.o ra.tab.o MiniSQL.o catalog.o btree.o buffer.o record.o interpreter.cpp 
 
 catalog.o: catalog.h catalog.cpp global.h MiniSQL.h
 	$(CC) -c catalog.cpp -o catalog.o

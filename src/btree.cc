@@ -384,7 +384,7 @@ void newNode(btree* bt, node* nd)
     nd->datas = new Data[bt->capacity + 1];
 }
 
-/* recycle node */
+/* recycle memory in node */
 void freeNode(btree* bt, node* nd)
 {
     if (bt->type==CHAR)
@@ -394,8 +394,8 @@ void freeNode(btree* bt, node* nd)
             free(nd->datas[i].str);
         }
     }
-    //free(nd->datas);
-    //free(nd->childs);
+    free(nd->datas);
+    free(nd->childs);
 }
 
 /* save node info */
